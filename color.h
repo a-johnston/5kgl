@@ -4,20 +4,33 @@
 
 #include <math.h>
 
-typedef float color[4];
+typedef struct {
+    float r;
+    float g;
+    float b;
+    float a;
+} color;
 
-color white = (color) { 1.0f, 1.0f, 1.0f, 1.0f };
-color black = (color) { 0.0f, 0.0f, 0.0f, 1.0f };
-color red   = (color) { 1.0f, 0.0f, 0.0f, 1.0f };
-color green = (color) { 0.0f, 1.0f, 0.0f, 1.0f };
-color blue  = (color) { 0.0f, 0.0f, 1.0f, 1.0f };
+color COLOR_WHITE = (color) { 1.0f, 1.0f, 1.0f, 1.0f };
+color COLOR_BLACK = (color) { 0.0f, 0.0f, 0.0f, 1.0f };
+color COLOR_RED   = (color) { 1.0f, 0.0f, 0.0f, 1.0f };
+color COLOR_GREEN = (color) { 0.0f, 1.0f, 0.0f, 1.0f };
+color COLOR_BLUE  = (color) { 0.0f, 0.0f, 1.0f, 1.0f };
+
+color COLOR_YELLOW = (color) { 1.0f, 1.0f, 0.0f, 1.0f };
+color COLOR_PURPLE = (color) { 1.0f, 0.0f, 1.0f, 1.0f };
+color COLOR_CYAN   = (color) { 0.0f, 1.0f, 1.0f, 1.0f };
+color COLOR_BLANK  = (color) { 0.0f, 0.0f, 0.0f, 0.0f };
+
+
+
 
 color color_interpolate(color a, color b, float i) {
     float j = 1 - i;
     return (color) {
-        a[0] * i + b[0] * j,
-        a[1] * i + b[1] * j,
-        a[2] * i + b[2] * j
+        a.r * i + b.r * j,
+        a.g * i + b.g * j,
+        a.b * i + b.b * j
     };
 }
 
@@ -35,6 +48,21 @@ color color_from_HSV(float hue, float sat, float val) {
     p    = val * (1 - sat);
     q    = val * (1 - sat * f);
     t    = val * (1 - sat * (1 - f));
+
+    switch (i) {
+        case 0:
+            return (color) { val, t, p };
+        case 1:
+            return (color) { q, val, p };
+        case 2:
+            return (color) { p, val, t };
+        case 3:
+            return (color) { p, q, val };
+        case 4:
+            return (color) { t, p, val };
+    }
+
+    return (color) { val, p, q };
 }
 
 #endif

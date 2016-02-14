@@ -3,6 +3,7 @@
 #define __SPACE_MATH
 
 #include <math.h>
+#include <string.h>
 
 /*
  * Types for 2D and 3D space operations
@@ -25,6 +26,28 @@ typedef struct {
 } quat;
 
 typedef float mat4[16];
+
+/*
+ * Constructors
+ */
+
+vec2* c_vec2(double x, double y) {
+    vec2* v = (vec2*) malloc(sizeof(vec2));
+    *v = (vec2) { x, y };
+    return v;
+}
+
+vec3* c_vec3(double x, double y, double z) {
+    vec3* v = (vec3*) malloc(sizeof(vec3));
+    *v = (vec3) { x, y, z };
+    return v;
+}
+
+quat* c_quat(double x, double y, double z, double w) {
+    quat* v = (quat*) malloc(sizeof(quat));
+    *v = (quat) { x, y, z, w };
+    return v;
+}
 
 /*
  * Standard addition
@@ -62,11 +85,6 @@ vec3 sub(vec3 a, vec3 b) {
     };
 }
 
-#define add(x, y) _Generic((x), \
-    vec2 : add_vec2, \
-    vec3 : add_vec3, \
-    quat : add_quat)(x, y)
-
 /*
  * Scaling
  */
@@ -95,15 +113,6 @@ quat mult_quatquat(quat a, quat b) {
     return (quat) { a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w };
 }
 
-#define mult(x, y) _Generic((y), \
-    double : _Generic((x), \
-        vec2 : mult_vec2, \
-        vec3 : mult_vec3, \
-        quat : mult_quat), \
-    vec2 : mult_vec22, \
-    vec3 : mult_vec33, \
-    quat : mult_quatquat) (x, y)
-
 /*
  * Dot products
  */
@@ -117,15 +126,9 @@ double dot_vec3(vec3 a, vec3 b) {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
-
 double dot_quat(quat a, quat b) {
     return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
 }
-
-#define dot(x, y) _Generic((x), \
-    vec2 : dot_vec2 \
-    vec3 : dot_vec3 \
-    quat : dot_quat)(x, y)
 
 /*
  * Norms and normalization
@@ -139,19 +142,18 @@ double norm2_vec3(vec3 a) {
     return a.x * a.x + a.y * a.y + a.z * a.z;
 }
 
+double norm_vec3(vec3 a) {
+    return sqrt(norm2_vec3(a));
+}
+
+vec3 normalize(vec3 a) {
+    double n = norm_vec3(a);
+    return n == 0 ? a : mult_vec3(a, 1 / n);
+}
+
 double norm2_quat(quat a) {
     return a.x * a.x + a.y * a.y + a.z * a.z + a.w * a.w;
 }
-
-#define norm2(x) _Generic((x), \
-    vec2 : norm2_vec2, \
-    vec3 : norm2_vec3, \
-    quat : norm2_quat)(x)
-
-#define norm(x) _Generic((x), default: sqrt(norm2(x)))
-
-#define normalize(x) _Generic((x), \
-    default: ((norm2(x) == 0.0) ? x : mult(x, 1 / norm(x))))
 
 /*
  * 3D vector math
@@ -241,6 +243,41 @@ void quat_to_matrix(quat q, mat4 m) {
     m[13] = 0.0f;
     m[14] = 0.0f;
     m[15] = 1.0f;
+}
+
+/*
+ * Matrices
+ */
+
+void mat4_perspective(mat4 *matrix, float aspect, float fov, float near, float far) {
+    float y_scale = 1.0f / tan(fov / 2.0f);
+    float x_scale = y_scale / aspect;
+    float frustum = far-near;
+
+    memset(matrix, 0, sizeof(mat4));
+
+    *matrix[0]  = x_scale;
+    *matrix[5]  = y_scale;
+    *matrix[10] = -((far+near)/frustum);
+    *matrix[11] = -1.0f;
+    *matrix[14] = -((2.0f * far * near)/frustum);
+    *matrix[15] = 0;
+}
+
+void mat4_look_at(float matrix[16], vec3 from, vec3 to, vec3 up) {
+    vec3 zaxis = normalize(sub(to, from));
+    vec3 xaxis = normalize(cross(up, zaxis));
+    vec3 yaxis = cross(zaxis, xaxis);
+
+    memset(matrix, 0, sizeof(mat4));
+
+    matrix[0]  = xaxis.x; matrix[1] = yaxis.x; matrix[2]  = zaxis.x; matrix[3]  = 0;
+    matrix[4]  = xaxis.y; matrix[5] = yaxis.y; matrix[6]  = zaxis.y; matrix[7]  = 0;
+    matrix[8]  = xaxis.z; matrix[9] = yaxis.z; matrix[10] = zaxis.z; matrix[11] = 0;
+    matrix[12] = -dot_vec3(xaxis, from);
+    matrix[13] = -dot_vec3(yaxis, from);
+    matrix[14] = -dot_vec3(zaxis, from);
+    matrix[15] =  1.0f;
 }
 
 /*

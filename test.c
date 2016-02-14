@@ -1,6 +1,7 @@
 #include "util.h"
 #include "mesh.h"
 #include "space_math.h"
+#include "render.h"
 #include <stdio.h>
 
 int main() {

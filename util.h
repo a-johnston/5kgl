@@ -14,9 +14,9 @@ typedef struct {
 } list;
 
 list* create_list() {
-    list* l = malloc(sizeof(list));
+    list* l = (list*) malloc(sizeof(list));
 
-    l->data     = malloc(sizeof(void*) * DEFAULT_LIST_CAPACITY);
+    l->data     = (void**) malloc(sizeof(void*) * DEFAULT_LIST_CAPACITY);
     l->capacity = DEFAULT_LIST_CAPACITY;
     l->length   = 0;
 
@@ -26,7 +26,7 @@ list* create_list() {
 int list_add(list *l, void *value) {
     if (l->length >= l->capacity) {
         l->capacity += DEFAULT_LIST_CAPACITY;
-        l->data = realloc(l->data, sizeof(void*) * l->capacity);
+        l->data = (void**) realloc(l->data, sizeof(void*) * l->capacity);
     }
 
     l->data[l->length] = value;
@@ -70,7 +70,7 @@ void list_clear(list *l) {
 
     l->length   = 0;
     l->capacity = DEFAULT_LIST_CAPACITY;
-    l->data     = realloc(l->data, sizeof(void*) * l->capacity);
+    l->data     = (void**) realloc(l->data, sizeof(void*) * l->capacity);
 }
 
 void list_free(list *l) {
@@ -94,7 +94,7 @@ char* read_file(char *filename, int *length) {
     *length = ftell(f);
     fseek(f, 0, SEEK_SET);
 
-    char *buffer = malloc(*length + 1);
+    char *buffer = (char*) malloc(*length + 1);
     *length = fread(buffer, 1, *length, f);
     fclose(f);
 

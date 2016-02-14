@@ -29,13 +29,13 @@ mesh make_mesh() {
 
 void mesh_translate(mesh m, vec3 v) {
     for (int i = 0; i < m.vert_count; i++) {
-        *((vec3*) list_get(m.verts, i)) = add(*((vec3*) list_get(m.verts, i)), v);
+        *((vec3*) list_get(m.verts, i)) = add_vec3(*((vec3*) list_get(m.verts, i)), v);
     }
 }
 
 void mesh_scale(mesh m, vec3 v) {
     for (int i = 0; i < m.vert_count; i++) {
-        *((vec3*) list_get(m.verts, i)) = mult(*((vec3*) list_get(m.verts, i)), v);
+        *((vec3*) list_get(m.verts, i)) = mult_vec33(*((vec3*) list_get(m.verts, i)), v);
     }
 }
 
@@ -56,11 +56,11 @@ int mesh_add_color(mesh m, color *c) {
 }
 
 void mesh_build_triangle(mesh m, vec3 *a, vec3 *b, vec3 *c) {
-    vec3 *norm = malloc(sizeof(vec3));
+    vec3 *norm = (vec3*) malloc(sizeof(vec3));
     *norm = normal_vector(a, b, c);
     mesh_add_normal(m, norm);
 
-    ivec3 *tri = malloc(sizeof(ivec3));
+    ivec3 *tri = (ivec3*) malloc(sizeof(ivec3));
     tri->i = mesh_add_point(m, a);
     tri->j = mesh_add_point(m, b);
     tri->k = mesh_add_point(m, c);
@@ -77,7 +77,7 @@ void mesh_make_normals(mesh m) {
     //clean slate
     vec3 *temp;
     for (int i = 0; i < m.verts->length; i++) {
-        temp  = malloc(sizeof(vec3));
+        temp  = (vec3*) malloc(sizeof(vec3));
         *temp = (vec3) { 0.0, 0.0, 0.0 };
         list_add(m.normals, temp);
     }
@@ -90,9 +90,9 @@ void mesh_make_normals(mesh m) {
             (vec3*) list_get(m.verts, tri.j),
             (vec3*) list_get(m.verts, tri.k));
 
-        *(vec3*) list_get(m.normals, tri.i) = add(*(vec3*) list_get(m.normals, tri.i), norm);
-        *(vec3*) list_get(m.normals, tri.j) = add(*(vec3*) list_get(m.normals, tri.j), norm);
-        *(vec3*) list_get(m.normals, tri.k) = add(*(vec3*) list_get(m.normals, tri.k), norm);
+        *(vec3*) list_get(m.normals, tri.i) = add_vec3(*(vec3*) list_get(m.normals, tri.i), norm);
+        *(vec3*) list_get(m.normals, tri.j) = add_vec3(*(vec3*) list_get(m.normals, tri.j), norm);
+        *(vec3*) list_get(m.normals, tri.k) = add_vec3(*(vec3*) list_get(m.normals, tri.k), norm);
     }
 
     //ensure norm = 1
