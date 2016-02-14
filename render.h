@@ -2,6 +2,7 @@
 
 #define __RENDER_UTIL
 
+#include <stdio.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "util.h"
@@ -21,7 +22,7 @@ void print_gl_log(
     free(log);
 }
 
-GLuint make_shader(GLenum type, char *filename) {
+GLuint make_shader(GLenum type, const char *filename){
     GLint length;
     GLchar *source = (GLchar*) read_file(filename, &length);
     GLuint shader;
@@ -32,17 +33,17 @@ GLuint make_shader(GLenum type, char *filename) {
 
     shader = glCreateShader(type);
     glShaderSource(shader, 1, (const GLchar**)&source, &length);
+
+    free(source);
     glCompileShader(shader);
 
     glGetShaderiv(shader, GL_COMPILE_STATUS, &shader_ok);
-
     if (!shader_ok) {
         fprintf(stderr, "Failed to compile %s:\n", filename);
         print_gl_log(shader, glGetShaderiv, glGetShaderInfoLog);
         glDeleteShader(shader);
         return 0;
     }
-
     return shader;
 }
 
@@ -75,6 +76,7 @@ void resize_callback(GLFWwindow *window, int width, int height) {
 
 void start_fullscreen(
     void (*key_callback)  (GLFWwindow*, int, int, int, int),
+    void (*start_callback) (),
     void (*step_callback) (double),
     void (*draw_callback) ()
 ) {
@@ -103,7 +105,7 @@ void start_fullscreen(
     }
 
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
 
     glfwSetFramebufferSizeCallback(window, resize_callback);
     glfwSetKeyCallback(window, key_callback);
@@ -116,11 +118,24 @@ void start_fullscreen(
         exit(EXIT_FAILURE);
     }
 
-    glfwSetTime(0.0);
+    start_callback();
 
+    glfwSetTime(0.0);
+    double time = 0.0;
+    int last = 0;
+    int frames = 0;
     while (!glfwWindowShouldClose(window)) {
+        time = glfwGetTime();
+        if ((int) time != last) {
+            printf("FPS: %d\n", frames);
+            frames = 0;
+            last = (int) time;
+        } else {
+            frames++;
+        }
+
         glfwPollEvents();
-        if (step_callback) step_callback(glfwGetTime());
+        if (step_callback) step_callback(time);
         if (draw_callback) draw_callback();
         glfwSwapBuffers(window);
     }

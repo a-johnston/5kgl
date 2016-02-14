@@ -83,10 +83,12 @@ void list_free(list *l) {
     free(l);
 }
 
-char* read_file(char *filename, int *length) {
+void* read_file(const char *filename, int *length) {
     FILE *f = fopen(filename, "r");
+    void *buffer;
 
     if (!f) {
+        fprintf(stderr, "Unable to open %s for reading\n", filename);
         return NULL;
     }
 
@@ -94,11 +96,10 @@ char* read_file(char *filename, int *length) {
     *length = ftell(f);
     fseek(f, 0, SEEK_SET);
 
-    char *buffer = (char*) malloc(*length + 1);
+    buffer = malloc(*length+1);
     *length = fread(buffer, 1, *length, f);
     fclose(f);
-
-    buffer[*length] = '\0';
+    ((char*)buffer)[*length] = '\0';
 
     return buffer;
 }
