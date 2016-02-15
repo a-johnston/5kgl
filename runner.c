@@ -3,32 +3,30 @@
 #include "mesh.h"
 #include <GLFW/glfw3.h>
 
-static int program, pos_handle;
+static int program, pos_handle, pers_handle, view_handle;
 
 static mesh *cube;
 static GLuint vert_buff;
 static GLuint tris_buff;
 
+static mat4 pers, view;
+
+static quat *q;
+
 void game_start() {
-    printf("Enter game start\n");
     int vert = make_shader(GL_VERTEX_SHADER, "color_vertex.glsl");
     int frag = make_shader(GL_FRAGMENT_SHADER, "color_fragment.glsl");
 
-    printf("make prog %d\n", glGetError());
     program = make_program(vert, frag);
-    printf("get handle %d %d\n", glGetError(), program);
-    pos_handle = glGetUniformLocation(program, "position");
+    pos_handle = glGetAttribLocation(program, "position");
+    pers_handle = glGetUniformLocation(program, "persp");
+    view_handle = glGetUniformLocation(program, "view");
 
-    printf("get cube %d\n", glGetError());
     cube = mesh_build_test();
-    printf("scale cube %d\n", glGetError());
-    mesh_scale(*cube, 0.5);
 
-    printf("vdata\n");
     float vdata[cube->verts->length * 3];
     short tdata[cube->tris->length  * 3];
 
-    printf("floatify\n");
     floatify_vec3(*(cube->verts), vdata);
     floatify_ivec3(*(cube->tris), tdata);
 
@@ -36,7 +34,15 @@ void game_start() {
 
     tris_buff = make_buffer(GL_ARRAY_BUFFER, tdata, sizeof(tdata));
 
-    printf("%d %d\n", cube->verts->length, cube->tris->length);
+    mat4_perspective(pers, 16.0f/9.0f, 90.0f, 0.1f, 10.0f);
+
+    q = c_quat(0, 0, 0, 1);
+
+    vec3 *v1 = c_vec3(-5, -5, -2);
+    vec3 *v2 = c_vec3(0, 0, 0);
+    vec3 *v3 = c_vec3(0, 0, 1);
+
+    mat4_look_at(view, *v1, *v2, *v3);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 }
@@ -46,13 +52,18 @@ void draw_call() {
 
     glUseProgram(program);
 
+    //quat_to_matrix(*q, view);
+
+    //glUniformMatrix4fv(pers_handle, 1, GL_FALSE, pers);
+    //glUniformMatrix4fv(view_handle, 1, GL_FALSE, view);
+
     glBindBuffer(GL_ARRAY_BUFFER, vert_buff);
     glVertexAttribPointer(
         pos_handle,
         3,
         GL_FLOAT,
         GL_FALSE,
-        0,
+        sizeof(GLfloat)*3,
         (void*)0);
 
     glEnableVertexAttribArray(pos_handle);
@@ -61,9 +72,15 @@ void draw_call() {
 
     glDrawElements(
         GL_TRIANGLE_STRIP,
-        12,
-        0,
+        24,
+        GL_UNSIGNED_SHORT,
         (void*)0);
+
+    int err = glGetError();
+
+    if (err != 0) {
+        printf("Error %d\n", err);
+    }
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {

@@ -1,8 +1,12 @@
-#version 120
-
 attribute vec3 position;
+
+uniform mat4 persp;
+uniform mat4 view;
+
+varying vec3 color;
 
 void main()
 {
-    gl_Position = vec4(position, 1.0) * 0.5;
+	color = position + vec3(0.5, 0.5, 0.5);
+    gl_Position = vec4(position, 1.0);
 }

@@ -39,7 +39,10 @@ vec2* c_vec2(double x, double y) {
 
 vec3* c_vec3(double x, double y, double z) {
     vec3* v = (vec3*) malloc(sizeof(vec3));
-    *v = (vec3) { x, y, z };
+    //*v = (vec3) { x, y, z };
+    v->x = x;
+    v->y = y;
+    v->z = z;
     return v;
 }
 
@@ -249,19 +252,19 @@ void quat_to_matrix(quat q, mat4 m) {
  * Matrices
  */
 
-void mat4_perspective(mat4 *matrix, float aspect, float fov, float near, float far) {
+void mat4_perspective(mat4 matrix, float aspect, float fov, float near, float far) {
     float y_scale = 1.0f / tan(fov / 2.0f);
     float x_scale = y_scale / aspect;
     float frustum = far-near;
 
     memset(matrix, 0, sizeof(mat4));
 
-    *matrix[0]  = x_scale;
-    *matrix[5]  = y_scale;
-    *matrix[10] = -((far+near)/frustum);
-    *matrix[11] = -1.0f;
-    *matrix[14] = -((2.0f * far * near)/frustum);
-    *matrix[15] = 0;
+    matrix[0]  = x_scale;
+    matrix[5]  = y_scale;
+    matrix[10] = -((far+near)/frustum);
+    matrix[11] = -1.0f;
+    matrix[14] = -((2.0f * far * near)/frustum);
+    matrix[15] = 0;
 }
 
 void mat4_look_at(float matrix[16], vec3 from, vec3 to, vec3 up) {

@@ -60,9 +60,8 @@ void mesh_translate(mesh m, vec3 v) {
 
 void mesh_scale(mesh m, double n) {
     for (int i = 0; i < m.verts->length; i++) {
-        //printf("%d %d\n", i, m.verts->length);
+        printf("%d %d\n", i, m.verts->length);
         vec3 j = *((vec3*) ((void**) m.verts)[i]);
-        //printf("%d, %d, %d\n", j.x, j.y, j.z);
         //j->x *= n;
         //j->y *= n;
         //j->z *= n;
@@ -86,10 +85,6 @@ int mesh_add_color(mesh m, color *c) {
 }
 
 void mesh_build_triangle(mesh m, vec3 *a, vec3 *b, vec3 *c) {
-    vec3 *norm = (vec3*) malloc(sizeof(vec3));
-    *norm = normal_vector(a, b, c);
-    mesh_add_normal(m, norm);
-
     ivec3 *tri = (ivec3*) malloc(sizeof(ivec3));
     tri->i = mesh_add_point(m, a);
     tri->j = mesh_add_point(m, b);
@@ -125,10 +120,10 @@ mesh* mesh_build_cube() {
 }
 
 mesh* mesh_build_test() {
-    vec3 *p0 = c_vec3(-1, -1, 0);
-    vec3 *p1 = c_vec3( 1, -1, 0);
-    vec3 *p2 = c_vec3(-1,  1, 0);
-    vec3 *p3 = c_vec3( 1,  1, 0);
+    vec3 *p0 = c_vec3(-0.5, -0.5, 0);
+    vec3 *p1 = c_vec3( 0.5, -0.5, 0);
+    vec3 *p2 = c_vec3(-0.5,  0.5, 0);
+    vec3 *p3 = c_vec3( 0.5,  0.5, 0);
 
     mesh *m = make_mesh();
 
