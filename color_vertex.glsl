@@ -8,5 +8,5 @@ varying vec3 color;
 void main()
 {
 	color = position + vec3(0.5, 0.5, 0.5);
-    gl_Position = vec4(position, 1.0);
+    gl_Position = view * vec4(position, 1.0);
 }

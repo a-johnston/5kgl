@@ -11,7 +11,7 @@ static GLuint tris_buff;
 
 static mat4 pers, view;
 
-static quat *q;
+static quat *q, *rot;
 
 void game_start() {
     int vert = make_shader(GL_VERTEX_SHADER, "color_vertex.glsl");
@@ -22,7 +22,7 @@ void game_start() {
     pers_handle = glGetUniformLocation(program, "persp");
     view_handle = glGetUniformLocation(program, "view");
 
-    cube = mesh_build_test();
+    cube = mesh_build_cube();
 
     float vdata[cube->verts->length * 3];
     short tdata[cube->tris->length  * 3];
@@ -34,9 +34,13 @@ void game_start() {
 
     tris_buff = make_buffer(GL_ARRAY_BUFFER, tdata, sizeof(tdata));
 
+    printf("tris :  %d", cube->tris->length * 3);
+
     mat4_perspective(pers, 16.0f/9.0f, 90.0f, 0.1f, 10.0f);
 
     q = c_quat(0, 0, 0, 1);
+    rot = c_quat(0, 0, 0, 1);
+    *rot = quat_from_euler_angles(0.001, 0.001, 0);
 
     vec3 *v1 = c_vec3(-5, -5, -2);
     vec3 *v2 = c_vec3(0, 0, 0);
@@ -52,10 +56,12 @@ void draw_call() {
 
     glUseProgram(program);
 
-    //quat_to_matrix(*q, view);
+    *q = quat_mult(*q, *rot);
+
+    quat_to_matrix(*q, view);
 
     //glUniformMatrix4fv(pers_handle, 1, GL_FALSE, pers);
-    //glUniformMatrix4fv(view_handle, 1, GL_FALSE, view);
+    glUniformMatrix4fv(view_handle, 1, GL_FALSE, view);
 
     glBindBuffer(GL_ARRAY_BUFFER, vert_buff);
     glVertexAttribPointer(
@@ -72,7 +78,7 @@ void draw_call() {
 
     glDrawElements(
         GL_TRIANGLE_STRIP,
-        24,
+        48,
         GL_UNSIGNED_SHORT,
         (void*)0);
 
