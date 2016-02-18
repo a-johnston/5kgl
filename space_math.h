@@ -280,6 +280,7 @@ void mat4_id(mat4 dest) {
 }
 
 void mat4_mult(mat4 dest, mat4 left, mat4 right) {
+    mat4_zero(dest);
     int base;
     for (int i = 0; i < 16; i++) {
         base = i % 4;

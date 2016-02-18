@@ -110,14 +110,14 @@ void start_fullscreen(
     }
 
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(0);
+    glfwSwapInterval(1);
 
     glfwSetFramebufferSizeCallback(window, resize_callback);
     glfwSetKeyCallback(window, key_callback);
 
     glewInit();
-    if (!GLEW_VERSION_2_0) {
-        fprintf(stderr, "OpenGL 2.0 not available\n");
+    if (!GLEW_VERSION_3_0) {
+        fprintf(stderr, "OpenGL 3.0 not available\n");
         glfwDestroyWindow(window);
         glfwTerminate();
         exit(EXIT_FAILURE);

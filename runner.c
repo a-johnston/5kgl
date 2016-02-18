@@ -10,7 +10,9 @@ static mesh *cube;
 static GLuint vert_buff;
 static GLuint tris_buff;
 
-static mat4 pers, view, vp;
+static mat4 pers, view, vp, m, mvp;
+
+static quat rot, q;
 
 void print_matrix(mat4 arr) {
     for (int i = 0; i < 16; i += 4) {
@@ -26,7 +28,7 @@ void game_start() {
     pos_handle = glGetAttribLocation(program, "position");
     mvp_handle = glGetUniformLocation(program, "mvp");
 
-    cube = mesh_build_cube();
+    cube = mesh_build_test();
 
     float vdata[cube->verts->length * 3];
     short tdata[cube->tris->length  * 3];
@@ -55,13 +57,16 @@ void game_start() {
     printf("vp\n");
     print_matrix(vp);
 
+    rot = quat_from_euler_angles(0.0f, 0.0f, 0.02f);
+    printf("%f %f %f %f\n", rot.x, rot.y, rot.z, rot.w);
+    q = (quat) { 0, 0, 0, 1 };
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 void step_call(double time) {
-    //quat q = quat_from_euler_angles((float) (time / 2.0), 1.6f, 0.0f);
-    //quat_to_matrix(q, vp);
+    q = quat_mult(rot, q);
+    quat_to_matrix(q, m);
 }
 
 void draw_call() {
@@ -69,16 +74,13 @@ void draw_call() {
 
     glUseProgram(program);
 
-    //*q = quat_mult(*q, *rot);
-
-    //quat_to_matrix(*q, view);
-    float asd[] = { -1.7279711f, -0.583039f, -0.58901393f, -0.57735026f, 1.7279711f, -0.583039f, -0.58901393f, -0.57735026f, 0.0f, 1.166078f, -0.58901393f, -0.57735026f, 0.0f, 0.0f, 3.2809231f, 5.196152f };
+    mat4_mult(mvp, vp, m);
 
     glBindBuffer(GL_ARRAY_BUFFER, vert_buff);
     glVertexAttribPointer(pos_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(pos_handle);
 
-    glUniformMatrix4fv(mvp_handle, 1, GL_FALSE, vp);
+    glUniformMatrix4fv(mvp_handle, 1, GL_FALSE, mvp);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tris_buff);
     glDrawElements(GL_TRIANGLES, cube->tris->length * 3, GL_UNSIGNED_SHORT, 0);
