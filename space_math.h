@@ -158,7 +158,7 @@ double norm_vec3(vec3 a) {
 
 vec3 normalize(vec3 a) {
     double n = norm_vec3(a);
-    return n == 0 ? a : mult_vec3(a, 1 / n);
+    return n == 0 ? a : mult_vec3(a, 1.0 / n);
 }
 
 double norm2_quat(quat a) {
@@ -170,10 +170,12 @@ double norm2_quat(quat a) {
  */
 
 vec3 cross(vec3 a, vec3 b) {
+    printf("%f %f %f\n", a.x, a.y, a.z);
+    printf("%f %f %f\n", b.x, b.y, b.z);
     return (vec3) {
         a.y * b.z - a.z * b.y,
         a.z * b.x - a.x * b.z,
-        a.x * b.y - a.y * a.x
+        a.x * b.y - a.y * b.x
     };
 }
 
@@ -307,16 +309,35 @@ void mat4_perspective(mat4 matrix, float fov, float near, float far) {
 }
 
 void mat4_look_at(mat4 matrix, vec3 from, vec3 to, vec3 up) {
-    vec3 zaxis = normalize(sub(to, from));
-    vec3 xaxis = normalize(cross(zaxis, up));
-    vec3 yaxis = cross(xaxis, zaxis);
-
+    printf("%f %f %f\n", up.x, up.y, up.z);
     mat4_zero(matrix);
 
-    matrix[0]  = xaxis.x; matrix[1] = yaxis.x; matrix[2]  = -zaxis.x;
-    matrix[4]  = xaxis.y; matrix[5] = yaxis.y; matrix[6]  = -zaxis.y;
-    matrix[8]  = xaxis.z; matrix[9] = yaxis.z; matrix[10] = -zaxis.z;
-    matrix[15] =  1.0f;
+    vec3 f = sub(to, from);
+    f = normalize(f);
+    printf("%f %f %f\n", f.x, f.y, f.z);
+
+    vec3 s = cross(f, up);
+
+    printf("%f %f %f\n", s.x, s.y, s.z);
+    s = normalize(s);
+    printf("%f %f %f\n", s.x, s.y, s.z);
+
+    vec3 u = cross(s, f);
+    printf("%f %f %f\n", u.x, u.y, u.z);
+
+    matrix[0] = s.x;
+    matrix[1] = u.x;
+    matrix[2] = -f.x;
+
+    matrix[4] = s.y;
+    matrix[5] = u.y;
+    matrix[6] = -f.y;
+
+    matrix[8] = s.z;
+    matrix[9] = u.z;
+    matrix[10] = -f.z;
+
+    matrix[15] = 1.0f;
 
     mat4_translate(matrix, -from.x, -from.y, -from.z);
 }
