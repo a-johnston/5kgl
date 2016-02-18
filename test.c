@@ -5,29 +5,14 @@
 #include <stdio.h>
 
 int main() {
-    int len;
-    char *content = read_file("junk.txt", &len);
+    mat4 m = {0};
+    quat *q = c_quat(0, 0, 0, 1);
 
-    vec3 v = (vec3) { 1.0, 1.0, 1.0 };
-    vec3 w = (vec3) { 2.0, 3.0, 4.0 };
+    quat_to_matrix(*q, m);
+    
+    mat4_perspective(m, 16.0f / 9.0f, 3.141592f / 4.0f, 1.0f, 10.0f);
 
-    list *vecList = create_list();
-
-    list_add(vecList, &v);
-    printf("%d\n", vecList->length);
-    list_add(vecList, &w);
-
-    printf("%d %d\n", vecList->length, list_find(vecList, &v));
-
-    list_remove(vecList, 0);
-
-    printf("%d %d\n", vecList->length, list_find(vecList, &v));
-
-    list_insert(vecList, &v, 0);
-
-    printf("%d %d\n", vecList->length, list_find(vecList, &v));
-
-    v = mult(v, w);
-
-    printf("%f %f %f\n", v.x, v.y, v.z);
+    for (int i = 0; i < 16; i += 4) {
+        printf("[ %f %f %f %f ]\n", m[i], m[i + 1], m[i + 2], m[i + 3]);
+    }
 }

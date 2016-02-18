@@ -2,6 +2,9 @@
 
 #define __MESH_UTIL
 
+#include<GL/glew.h>
+#include <GLFW/glfw3.h>
+
 #include "space_math.h"
 #include "color.h"
 #include "util.h"
@@ -60,11 +63,10 @@ void mesh_translate(mesh m, vec3 v) {
 
 void mesh_scale(mesh m, double n) {
     for (int i = 0; i < m.verts->length; i++) {
-        printf("%d %d\n", i, m.verts->length);
         vec3 j = *((vec3*) ((void**) m.verts)[i]);
-        //j->x *= n;
-        //j->y *= n;
-        //j->z *= n;
+        j.x *= n;
+        j.y *= n;
+        j.z *= n;
     }
 }
 
@@ -98,23 +100,23 @@ void mesh_build_quad(mesh m, vec3 *a, vec3 *b, vec3 *c, vec3 *d) {
 }
 
 mesh* mesh_build_cube() {
-    vec3 *p0 = c_vec3(-1, -1, -1);
-    vec3 *p1 = c_vec3( 1, -1, -1);
-    vec3 *p2 = c_vec3(-1,  1, -1);
-    vec3 *p3 = c_vec3( 1,  1, -1);
-    vec3 *p4 = c_vec3(-1, -1,  1);
-    vec3 *p5 = c_vec3( 1, -1,  1);
-    vec3 *p6 = c_vec3(-1,  1,  1);
-    vec3 *p7 = c_vec3( 1,  1,  1);
+    vec3 p0 = (vec3) { -1, -1, -1 };
+    vec3 p1 = (vec3) {  1, -1, -1 };
+    vec3 p2 = (vec3) { -1,  1, -1 };
+    vec3 p3 = (vec3) {  1,  1, -1 };
+    vec3 p4 = (vec3) { -1, -1,  1 };
+    vec3 p5 = (vec3) {  1, -1,  1 };
+    vec3 p6 = (vec3) { -1,  1,  1 };
+    vec3 p7 = (vec3) {  1,  1,  1 };
 
     mesh *m = make_mesh();
 
-    mesh_build_quad(*m, p0, p2, p1, p3);
-    mesh_build_quad(*m, p1, p3, p5, p7);
-    mesh_build_quad(*m, p0, p4, p2, p6);
-    mesh_build_quad(*m, p0, p1, p4, p5);
-    mesh_build_quad(*m, p2, p6, p3, p7);
-    mesh_build_quad(*m, p4, p5, p6, p7);
+    mesh_build_quad(*m, &p0, &p2, &p1, &p3);
+    mesh_build_quad(*m, &p1, &p3, &p5, &p7);
+    mesh_build_quad(*m, &p0, &p4, &p2, &p6);
+    mesh_build_quad(*m, &p0, &p1, &p4, &p5);
+    mesh_build_quad(*m, &p2, &p6, &p3, &p7);
+    mesh_build_quad(*m, &p4, &p5, &p6, &p7);
 
     return m;
 }

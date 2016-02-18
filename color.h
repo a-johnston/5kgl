@@ -11,16 +11,16 @@ typedef struct {
     float a;
 } color;
 
-color COLOR_WHITE = (color) { 1.0f, 1.0f, 1.0f, 1.0f };
-color COLOR_BLACK = (color) { 0.0f, 0.0f, 0.0f, 1.0f };
-color COLOR_RED   = (color) { 1.0f, 0.0f, 0.0f, 1.0f };
-color COLOR_GREEN = (color) { 0.0f, 1.0f, 0.0f, 1.0f };
-color COLOR_BLUE  = (color) { 0.0f, 0.0f, 1.0f, 1.0f };
+static const color COLOR_WHITE = { 1.0f, 1.0f, 1.0f, 1.0f };
+const color COLOR_BLACK = { 0.0f, 0.0f, 0.0f, 1.0f };
+const color COLOR_RED   = { 1.0f, 0.0f, 0.0f, 1.0f };
+const color COLOR_GREEN = { 0.0f, 1.0f, 0.0f, 1.0f };
+const color COLOR_BLUE  = { 0.0f, 0.0f, 1.0f, 1.0f };
 
-color COLOR_YELLOW = (color) { 1.0f, 1.0f, 0.0f, 1.0f };
-color COLOR_PURPLE = (color) { 1.0f, 0.0f, 1.0f, 1.0f };
-color COLOR_CYAN   = (color) { 0.0f, 1.0f, 1.0f, 1.0f };
-color COLOR_BLANK  = (color) { 0.0f, 0.0f, 0.0f, 0.0f };
+const color COLOR_YELLOW = { 1.0f, 1.0f, 0.0f, 1.0f };
+const color COLOR_PURPLE = { 1.0f, 0.0f, 1.0f, 1.0f };
+const color COLOR_CYAN   = { 0.0f, 1.0f, 1.0f, 1.0f };
+const color COLOR_BLANK  = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 
 
@@ -30,7 +30,8 @@ color color_interpolate(color a, color b, float i) {
     return (color) {
         a.r * i + b.r * j,
         a.g * i + b.g * j,
-        a.b * i + b.b * j
+        a.b * i + b.b * j,
+        a.a * i + b.a * j
     };
 }
 
@@ -39,7 +40,7 @@ color color_from_HSV(float hue, float sat, float val) {
     float f, p, q, t;
 
     if (sat == 0) {
-        return (color) { val, val, val };
+        return (color) { val, val, val, 1 };
     }
 
     hue *= 6.0f;
@@ -51,18 +52,18 @@ color color_from_HSV(float hue, float sat, float val) {
 
     switch (i) {
         case 0:
-            return (color) { val, t, p };
+            return (color) { val, t, p, 1 };
         case 1:
-            return (color) { q, val, p };
+            return (color) { q, val, p, 1 };
         case 2:
-            return (color) { p, val, t };
+            return (color) { p, val, t, 1 };
         case 3:
-            return (color) { p, q, val };
+            return (color) { p, q, val, 1 };
         case 4:
-            return (color) { t, p, val };
+            return (color) { t, p, val, 1 };
     }
 
-    return (color) { val, p, q };
+    return (color) { val, p, q, 1 };
 }
 
 #endif

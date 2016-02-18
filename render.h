@@ -71,7 +71,12 @@ GLuint make_program(GLuint vertex_shader, GLuint fragment_shader) {
 static float ar = 0.0f;
 
 void resize_callback(GLFWwindow *window, int width, int height) {
+    (void) window;
     ar = (float) width / (float) height;
+}
+
+float get_aspect_ratio() {
+    return ar;
 }
 
 void start_fullscreen(

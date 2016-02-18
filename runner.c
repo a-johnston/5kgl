@@ -3,15 +3,20 @@
 #include "mesh.h"
 #include <GLFW/glfw3.h>
 
-static int program, pos_handle, pers_handle, view_handle;
+static int program, pos_handle, mvp_handle;
 
 static mesh *cube;
+
 static GLuint vert_buff;
 static GLuint tris_buff;
 
-static mat4 pers, view;
+static mat4 pers, view, vp;
 
-static quat *q, *rot;
+void print_matrix(mat4 arr) {
+    for (int i = 0; i < 16; i += 4) {
+        printf("[ %f %f %f %f ]\n", arr[i], arr[i+1], arr[i+2], arr[i+3]);
+    }
+}
 
 void game_start() {
     int vert = make_shader(GL_VERTEX_SHADER, "color_vertex.glsl");
@@ -19,8 +24,7 @@ void game_start() {
 
     program = make_program(vert, frag);
     pos_handle = glGetAttribLocation(program, "position");
-    pers_handle = glGetUniformLocation(program, "persp");
-    view_handle = glGetUniformLocation(program, "view");
+    mvp_handle = glGetUniformLocation(program, "mvp");
 
     cube = mesh_build_cube();
 
@@ -34,21 +38,30 @@ void game_start() {
 
     tris_buff = make_buffer(GL_ARRAY_BUFFER, tdata, sizeof(tdata));
 
-    printf("tris :  %d", cube->tris->length * 3);
+    mat4_perspective(pers, 70.0f, 1.0f, 100.0f);
 
-    mat4_perspective(pers, 16.0f/9.0f, 90.0f, 0.1f, 10.0f);
+    vec3 v1 = (vec3) { 3, 3, 3 };
+    vec3 v2 = (vec3) { 0, 0, 0 };
+    vec3 v3 = (vec3) { 0, 0, 1 };
 
-    q = c_quat(0, 0, 0, 1);
-    rot = c_quat(0, 0, 0, 1);
-    *rot = quat_from_euler_angles(0.001, 0.001, 0);
+    mat4_look_at(view, v1, v2, v3);
 
-    vec3 *v1 = c_vec3(-5, -5, -2);
-    vec3 *v2 = c_vec3(0, 0, 0);
-    vec3 *v3 = c_vec3(0, 0, 1);
+    mat4_mult(vp, pers, view);
 
-    mat4_look_at(view, *v1, *v2, *v3);
+    printf("v\n");
+    print_matrix(view);
+    printf("p\n");
+    print_matrix(pers);
+    printf("vp\n");
+    print_matrix(vp);
+
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+}
+
+void step_call(double time) {
+    //quat q = quat_from_euler_angles((float) (time / 2.0), 1.6f, 0.0f);
+    //quat_to_matrix(q, vp);
 }
 
 void draw_call() {
@@ -56,31 +69,22 @@ void draw_call() {
 
     glUseProgram(program);
 
-    *q = quat_mult(*q, *rot);
+    //*q = quat_mult(*q, *rot);
 
-    quat_to_matrix(*q, view);
-
-    //glUniformMatrix4fv(pers_handle, 1, GL_FALSE, pers);
-    glUniformMatrix4fv(view_handle, 1, GL_FALSE, view);
+    //quat_to_matrix(*q, view);
+    float asd[] = { -1.7279711f, -0.583039f, -0.58901393f, -0.57735026f, 1.7279711f, -0.583039f, -0.58901393f, -0.57735026f, 0.0f, 1.166078f, -0.58901393f, -0.57735026f, 0.0f, 0.0f, 3.2809231f, 5.196152f };
 
     glBindBuffer(GL_ARRAY_BUFFER, vert_buff);
-    glVertexAttribPointer(
-        pos_handle,
-        3,
-        GL_FLOAT,
-        GL_FALSE,
-        sizeof(GLfloat)*3,
-        (void*)0);
-
+    glVertexAttribPointer(pos_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(pos_handle);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tris_buff);
+    glUniformMatrix4fv(mvp_handle, 1, GL_FALSE, vp);
 
-    glDrawElements(
-        GL_TRIANGLE_STRIP,
-        48,
-        GL_UNSIGNED_SHORT,
-        (void*)0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tris_buff);
+    glDrawElements(GL_TRIANGLES, cube->tris->length * 3, GL_UNSIGNED_SHORT, 0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     int err = glGetError();
 
@@ -90,13 +94,15 @@ void draw_call() {
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    (void) scancode;
+    (void) mods;
     if (action == GLFW_PRESS && key == GLFW_KEY_ESCAPE) {
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
 }
 
 int main() {
-    start_fullscreen(key_callback, game_start, NULL, draw_call);
+    start_fullscreen(key_callback, game_start, step_call, draw_call);
 
     return 0;
 }

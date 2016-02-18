@@ -5,6 +5,8 @@
 #include <math.h>
 #include <string.h>
 
+#include "render.h"
+
 /*
  * Types for 2D and 3D space operations
  */
@@ -47,9 +49,14 @@ vec3* c_vec3(double x, double y, double z) {
 }
 
 quat* c_quat(double x, double y, double z, double w) {
-    quat* v = (quat*) malloc(sizeof(quat));
-    *v = (quat) { x, y, z, w };
-    return v;
+    quat *q = (quat*) malloc(sizeof(quat));
+    *q = (quat) { x, y, z, w };
+    return q;
+}
+
+mat4* c_mat4() {
+    mat4* m = (mat4*) malloc(sizeof(mat4));
+    return m;
 }
 
 /*
@@ -226,6 +233,12 @@ quat quat_mult(quat a, quat b) {
     };
 }
 
+vec3 quat_transform(quat q, vec3 v) {
+    quat qv = (quat) { v.x, v.y, v.z, 0.0f };
+    qv = quat_mult(q, quat_mult(qv, quat_conjugate(q)));
+    return (vec3) { q.x, q.y, q.z };
+}
+
 void quat_to_matrix(quat q, mat4 m) {
     m[0]  = (float) (1 - 2 * (q.y * q.y + q.z * q.z));
     m[1]  = (float)     (2 * (q.x * q.y + q.z * q.w));
@@ -252,35 +265,60 @@ void quat_to_matrix(quat q, mat4 m) {
  * Matrices
  */
 
-void mat4_perspective(mat4 matrix, float aspect, float fov, float near, float far) {
-    float y_scale = 1.0f / tan(fov / 2.0f);
-    float x_scale = y_scale / aspect;
-    float frustum = far-near;
-
-    memset(matrix, 0, sizeof(mat4));
-
-    matrix[0]  = x_scale;
-    matrix[5]  = y_scale;
-    matrix[10] = -((far+near)/frustum);
-    matrix[11] = -1.0f;
-    matrix[14] = -((2.0f * far * near)/frustum);
-    matrix[15] = 0;
+void mat4_zero(mat4 m) {
+    memset(m, 0, sizeof(mat4));
 }
 
-void mat4_look_at(float matrix[16], vec3 from, vec3 to, vec3 up) {
+void mat4_id(mat4 dest) {
+    mat4_zero(dest);
+    dest[0]  = 1;
+    dest[5]  = 1;
+    dest[10] = 1;
+    dest[15] = 1;
+}
+
+void mat4_mult(mat4 dest, mat4 left, mat4 right) {
+    int base;
+    for (int i = 0; i < 16; i++) {
+        base = i % 4;
+        for (int j = 0; j < 4; j++) {
+            dest[i] += left[i - base + j] * right[base + j * 4];
+        }
+    }
+}
+
+void mat4_translate(mat4 m, float x, float y, float z) {
+    for (int i=0 ; i<4 ; i++) {
+        m[12 + i] += m[i] * x + m[4 + i] * y + m[8 + i] * z;
+    }
+}
+
+void mat4_perspective(mat4 matrix, float fov, float near, float far) {
+    float f = 1.0f / tan(fov * 3.141592653f / 360.0f);
+    float frustum = near - far;
+
+    mat4_zero(matrix);
+
+    matrix[0]  = f / get_aspect_ratio();
+    matrix[5]  = f;
+    matrix[10] = (far + near) / frustum;
+    matrix[11] = -1.0f;
+    matrix[14] = (2.0f * far * near) / frustum;
+}
+
+void mat4_look_at(mat4 matrix, vec3 from, vec3 to, vec3 up) {
     vec3 zaxis = normalize(sub(to, from));
-    vec3 xaxis = normalize(cross(up, zaxis));
-    vec3 yaxis = cross(zaxis, xaxis);
+    vec3 xaxis = normalize(cross(zaxis, up));
+    vec3 yaxis = cross(xaxis, zaxis);
 
-    memset(matrix, 0, sizeof(mat4));
+    mat4_zero(matrix);
 
-    matrix[0]  = xaxis.x; matrix[1] = yaxis.x; matrix[2]  = zaxis.x; matrix[3]  = 0;
-    matrix[4]  = xaxis.y; matrix[5] = yaxis.y; matrix[6]  = zaxis.y; matrix[7]  = 0;
-    matrix[8]  = xaxis.z; matrix[9] = yaxis.z; matrix[10] = zaxis.z; matrix[11] = 0;
-    matrix[12] = -dot_vec3(xaxis, from);
-    matrix[13] = -dot_vec3(yaxis, from);
-    matrix[14] = -dot_vec3(zaxis, from);
+    matrix[0]  = xaxis.x; matrix[1] = yaxis.x; matrix[2]  = -zaxis.x;
+    matrix[4]  = xaxis.y; matrix[5] = yaxis.y; matrix[6]  = -zaxis.y;
+    matrix[8]  = xaxis.z; matrix[9] = yaxis.z; matrix[10] = -zaxis.z;
     matrix[15] =  1.0f;
+
+    mat4_translate(matrix, -from.x, -from.y, -from.z);
 }
 
 /*
@@ -298,5 +336,51 @@ void mat4_look_at(float matrix[16], vec3 from, vec3 to, vec3 up) {
  */
 
 #define dist(a, b) _Generic((a, b), norm2(add(a, mult(b, -1.0))))
+
+/*
+ * Camera helpers
+ */
+
+struct Camera {
+    float fov, znear, zfar;
+    vec3 from;
+    vec3 to;
+    vec3 up;
+    mat4 v;
+    mat4 p;
+    mat4 vp;
+};
+
+void __cam_update_vp(struct Camera *camera) {
+    mat4_mult(camera->vp, camera->p, camera->v);
+}
+
+void cam_update_view(struct Camera *camera, vec3 *from, vec3 *to, vec3 *up) {
+    if (from != NULL) {
+        camera->from = *from;
+    }
+    if (to != NULL) {
+        camera->to = *to;
+    }
+    if (up != NULL) {
+        camera->up = *up;
+    }
+
+    mat4_look_at(camera->v, camera->from, camera->to, camera->up);
+    __cam_update_vp(camera);
+}
+
+void cam_update_perspective(struct Camera *camera, float fov, float znear, float zfar) {
+    camera->fov   = fov;
+    camera->znear = znear;
+    camera->zfar  = zfar;
+
+    mat4_perspective(camera->p, fov, znear, zfar);
+    __cam_update_vp(camera);
+}
+
+void cam_get_mvp(mat4 mvp, struct Camera *camera, mat4 model) {
+    mat4_mult(mvp, camera->vp, model);
+}
 
 #endif
