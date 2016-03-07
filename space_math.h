@@ -7,6 +7,8 @@
 
 #include "render.h"
 
+double deg_to_rad = M_PI / 180.0;
+
 /*
  * Types for 2D and 3D space operations
  */
@@ -170,8 +172,6 @@ double norm2_quat(quat a) {
  */
 
 vec3 cross(vec3 a, vec3 b) {
-    printf("%f %f %f\n", a.x, a.y, a.z);
-    printf("%f %f %f\n", b.x, b.y, b.z);
     return (vec3) {
         a.y * b.z - a.z * b.y,
         a.z * b.x - a.x * b.z,
@@ -188,7 +188,7 @@ vec3 normal_vector(vec3 *a, vec3 *b, vec3 *c) {
  */
 
 quat quat_from_axis_angle(vec3 axis, double angle) {
-    angle /= 2.0;
+    angle *= deg_to_rad / 2.0;
     double sina = sin(angle);
     return (quat) {
         axis.x * sina,
@@ -199,9 +199,9 @@ quat quat_from_axis_angle(vec3 axis, double angle) {
 }
 
 quat quat_from_euler_angles(double yaw, double pitch, double roll) {
-    yaw   /= 2.0;
-    pitch /= 2.0;
-    roll  /= 2.0;
+    yaw   *= deg_to_rad / 2.0;
+    pitch *= deg_to_rad / 2.0;
+    roll  *= deg_to_rad / 2.0;
 
     double shy = sin(yaw);
     double chy = cos(yaw);
@@ -244,16 +244,16 @@ vec3 quat_transform(quat q, vec3 v) {
 void quat_to_matrix(quat q, mat4 m) {
     m[0]  = (float) (1 - 2 * (q.y * q.y + q.z * q.z));
     m[1]  = (float)     (2 * (q.x * q.y + q.z * q.w));
-    m[2]  = (float)     (2 * (q.x * q.z + q.y * q.w));
+    m[2]  = (float)     (2 * (q.x * q.z - q.y * q.w));
     m[3]  = 0.0f;
 
-    m[4]  = (float)     (2 * (q.x * q.y + q.z * q.w));
+    m[4]  = (float)     (2 * (q.x * q.y - q.z * q.w));
     m[5]  = (float) (1 - 2 * (q.x * q.x + q.z * q.z));
     m[6]  = (float)     (2 * (q.y * q.z + q.x * q.w));
     m[7]  = 0.0f;
 
     m[8]  = (float)     (2 * (q.x * q.z + q.y * q.w));
-    m[9]  = (float)     (2 * (q.y * q.z + q.x * q.w));
+    m[9]  = (float)     (2 * (q.y * q.z - q.x * q.w));
     m[10] = (float) (1 - 2 * (q.x * q.x + q.y * q.y));
     m[11] = 0.0f;
 
@@ -297,7 +297,7 @@ void mat4_translate(mat4 m, float x, float y, float z) {
 }
 
 void mat4_perspective(mat4 matrix, float fov, float near, float far) {
-    float f = 1.0f / tan(fov * 3.141592653f / 360.0f);
+    float f = 1.0f / tan(fov * deg_to_rad / 2.0);
     float frustum = near - far;
 
     mat4_zero(matrix);

@@ -28,7 +28,7 @@ void game_start() {
     pos_handle = glGetAttribLocation(program, "position");
     mvp_handle = glGetUniformLocation(program, "mvp");
 
-    cube = mesh_build_test();
+    cube = mesh_build_cube();
 
     float vdata[cube->verts->length * 3];
     short tdata[cube->tris->length  * 3];
@@ -42,13 +42,13 @@ void game_start() {
 
     mat4_perspective(pers, 70.0f, 1.0f, 100.0f);
 
-    vec3 v1 = (vec3) { 3, 3, 3 };
+    vec3 v1 = (vec3) { 1, 3, 3 };
     vec3 v2 = (vec3) { 0, 0, 0 };
     vec3 v3 = (vec3) { 0, 0, 1 };
 
     mat4_look_at(view, v1, v2, v3);
 
-    mat4_mult(vp, pers, view);
+    mat4_mult(vp, view, pers);
 
     printf("v\n");
     print_matrix(view);
@@ -57,11 +57,10 @@ void game_start() {
     printf("vp\n");
     print_matrix(vp);
 
-    rot = quat_from_euler_angles(0.0f, 0.0f, 0.02f);
-    printf("%f %f %f %f\n", rot.x, rot.y, rot.z, rot.w);
-    q = (quat) { 0, 0, 0, 1 };
-
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+    q = (quat) { 0.0, 0.0, 0.0, 1.0 };
+    rot = quat_from_euler_angles(0.0, 0.0, 1.0);
 }
 
 void step_call(double time) {
@@ -74,7 +73,7 @@ void draw_call() {
 
     glUseProgram(program);
 
-    mat4_mult(mvp, vp, m);
+    mat4_mult(mvp, m, vp);
 
     glBindBuffer(GL_ARRAY_BUFFER, vert_buff);
     glVertexAttribPointer(pos_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);

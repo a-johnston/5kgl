@@ -96,27 +96,27 @@ void mesh_build_triangle(mesh m, vec3 *a, vec3 *b, vec3 *c) {
 
 void mesh_build_quad(mesh m, vec3 *a, vec3 *b, vec3 *c, vec3 *d) {
     mesh_build_triangle(m, a, b, c);
-    mesh_build_triangle(m, b, c, d);
+    mesh_build_triangle(m, d, c, b);
 }
 
 mesh* mesh_build_cube() {
-    vec3 p0 = (vec3) { -1, -1, -1 };
-    vec3 p1 = (vec3) {  1, -1, -1 };
-    vec3 p2 = (vec3) { -1,  1, -1 };
-    vec3 p3 = (vec3) {  1,  1, -1 };
-    vec3 p4 = (vec3) { -1, -1,  1 };
-    vec3 p5 = (vec3) {  1, -1,  1 };
-    vec3 p6 = (vec3) { -1,  1,  1 };
-    vec3 p7 = (vec3) {  1,  1,  1 };
+    vec3 *p0 = c_vec3(-1, -1, -1);
+    vec3 *p1 = c_vec3( 1, -1, -1);
+    vec3 *p2 = c_vec3(-1,  1, -1);
+    vec3 *p3 = c_vec3( 1,  1, -1);
+    vec3 *p4 = c_vec3(-1, -1,  1);
+    vec3 *p5 = c_vec3( 1, -1,  1);
+    vec3 *p6 = c_vec3(-1,  1,  1);
+    vec3 *p7 = c_vec3( 1,  1,  1);
 
     mesh *m = make_mesh();
 
-    mesh_build_quad(*m, &p0, &p2, &p1, &p3);
-    mesh_build_quad(*m, &p1, &p3, &p5, &p7);
-    mesh_build_quad(*m, &p0, &p4, &p2, &p6);
-    mesh_build_quad(*m, &p0, &p1, &p4, &p5);
-    mesh_build_quad(*m, &p2, &p6, &p3, &p7);
-    mesh_build_quad(*m, &p4, &p5, &p6, &p7);
+    mesh_build_quad(*m, p0, p2, p1, p3);
+    mesh_build_quad(*m, p1, p3, p5, p7);
+    mesh_build_quad(*m, p0, p4, p2, p6);
+    mesh_build_quad(*m, p0, p1, p4, p5);
+    mesh_build_quad(*m, p2, p6, p3, p7);
+    mesh_build_quad(*m, p4, p5, p6, p7);
 
     return m;
 }
