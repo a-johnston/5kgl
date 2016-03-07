@@ -6,7 +6,6 @@ varying vec3 color;
 
 void main()
 {
-
-	color = position * 0.5 + vec3(0.25, 0.25, 0.25);
+	color = position * 0.4 + vec3(0.5, 0.5, 0.5);
     gl_Position = mvp * vec4(position, 1.0);
 }

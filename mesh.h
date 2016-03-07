@@ -95,8 +95,8 @@ void mesh_build_triangle(mesh m, vec3 *a, vec3 *b, vec3 *c) {
 }
 
 void mesh_build_quad(mesh m, vec3 *a, vec3 *b, vec3 *c, vec3 *d) {
-    mesh_build_triangle(m, a, b, c);
-    mesh_build_triangle(m, d, c, b);
+    mesh_build_triangle(m, a, c, b);
+    mesh_build_triangle(m, b, d, c);
 }
 
 mesh* mesh_build_cube() {

@@ -123,6 +123,9 @@ void start_fullscreen(
         exit(EXIT_FAILURE);
     }
 
+    glCullFace(GL_BACK);
+    glEnable(GL_DEPTH_TEST);
+
     start_callback();
 
     glfwSetTime(0.0);

@@ -42,7 +42,7 @@ void game_start() {
 
     mat4_perspective(pers, 70.0f, 1.0f, 100.0f);
 
-    vec3 v1 = (vec3) { 1, 3, 3 };
+    vec3 v1 = (vec3) { 3, 0, 3 };
     vec3 v2 = (vec3) { 0, 0, 0 };
     vec3 v3 = (vec3) { 0, 0, 1 };
 
