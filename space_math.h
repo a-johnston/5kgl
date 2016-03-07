@@ -310,21 +310,15 @@ void mat4_perspective(mat4 matrix, float fov, float near, float far) {
 }
 
 void mat4_look_at(mat4 matrix, vec3 from, vec3 to, vec3 up) {
-    printf("%f %f %f\n", up.x, up.y, up.z);
     mat4_zero(matrix);
 
     vec3 f = sub(to, from);
     f = normalize(f);
-    printf("%f %f %f\n", f.x, f.y, f.z);
 
     vec3 s = cross(f, up);
 
-    printf("%f %f %f\n", s.x, s.y, s.z);
     s = normalize(s);
-    printf("%f %f %f\n", s.x, s.y, s.z);
-
     vec3 u = cross(s, f);
-    printf("%f %f %f\n", u.x, u.y, u.z);
 
     matrix[0] = s.x;
     matrix[1] = u.x;

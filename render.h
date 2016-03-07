@@ -79,71 +79,77 @@ float get_aspect_ratio() {
     return ar;
 }
 
-void start_fullscreen(
-    void (*key_callback)  (GLFWwindow*, int, int, int, int),
-    void (*start_callback) (),
-    void (*step_callback) (double),
-    void (*draw_callback) ()
-) {
+GLFWwindow *window;
+
+GLFWwindow* make_window(int width, int height, char *title) {
     if (!glfwInit()) {
         fprintf(stderr, "Failed to init GLFW!\n");
         exit(EXIT_FAILURE);
     }
 
-    GLFWwindow *window;
-    GLFWmonitor *monitor = glfwGetPrimaryMonitor();
+    GLFWmonitor *monitor = NULL;
 
-    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-    glfwWindowHint(GLFW_RED_BITS, mode->redBits);
-    glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
-    glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
-    glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+    if (width < 1 && height < 1) {
+        monitor = glfwGetPrimaryMonitor();
 
-    window = glfwCreateWindow(mode->width, mode->height, "5KGL", monitor, NULL);
-    ar = (float) mode->width / (float) mode->height;
+        const GLFWvidmode *mode = glfwGetVideoMode(monitor);
+        glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+        glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+        glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+        glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+
+        width  = mode->width;
+        height = mode->height;
+    }
+
+    window = glfwCreateWindow(width, height, title, monitor, NULL);
+    ar = (float) width / (float) height;
 
     if (!window) {
-        fprintf(stderr, "Failed to grab window!\n");
-        glfwDestroyWindow(window);
+        fprintf(stderr, "Failed to create window\n");
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
 
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
-
     glfwSetFramebufferSizeCallback(window, resize_callback);
-    glfwSetKeyCallback(window, key_callback);
 
-    glewInit();
+    GLenum err;
+    if ((err = glewInit()) != GLEW_OK) {
+        fprintf(stderr, "Failed to init glew: %s\n", glewGetErrorString(err));
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
+
     if (!GLEW_VERSION_3_0) {
         fprintf(stderr, "OpenGL 3.0 not available\n");
-        glfwDestroyWindow(window);
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
 
     glCullFace(GL_BACK);
     glEnable(GL_DEPTH_TEST);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-    start_callback();
+    return window;
+}
 
+void set_target_framerate(int fps) {
+    if (fps > 0) {
+        glfwSwapInterval(60.0f / fps);
+    } else {
+        glfwSwapInterval(0);
+    }
+}
+
+void start_main_loop(
+    void (*step_callback) (double),
+    void (*draw_callback) ()
+) {
     glfwSetTime(0.0);
-    double time = 0.0;
-    int last = 0;
-    int frames = 0;
     while (!glfwWindowShouldClose(window)) {
-        time = glfwGetTime();
-        if ((int) time != last) {
-            printf("FPS: %d\n", frames);
-            frames = 0;
-            last = (int) time;
-        } else {
-            frames++;
-        }
-
         glfwPollEvents();
-        if (step_callback) step_callback(time);
+        if (step_callback) step_callback(glfwGetTime());
         if (draw_callback) draw_callback();
         glfwSwapBuffers(window);
     }
