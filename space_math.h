@@ -374,7 +374,7 @@ void mat4_look_at(mat4 matrix, vec3 from, vec3 to, vec3 up) {
  * Camera helpers
  */
 
-struct Camera {
+typedef struct {
     float fov, znear, zfar;
     vec3 from;
     vec3 to;
@@ -382,13 +382,13 @@ struct Camera {
     mat4 v;
     mat4 p;
     mat4 vp;
-};
+} Camera;
 
-void __cam_update_vp(struct Camera *camera) {
-    mat4_mult(camera->vp, camera->p, camera->v);
+void __cam_update_vp(Camera *camera) {
+    mat4_mult(camera->vp, camera->v, camera->p);
 }
 
-void cam_update_view(struct Camera *camera, vec3 *from, vec3 *to, vec3 *up) {
+void cam_update_view(Camera *camera, vec3 *from, vec3 *to, vec3 *up) {
     if (from != NULL) {
         camera->from = *from;
     }
@@ -403,7 +403,7 @@ void cam_update_view(struct Camera *camera, vec3 *from, vec3 *to, vec3 *up) {
     __cam_update_vp(camera);
 }
 
-void cam_update_perspective(struct Camera *camera, float fov, float znear, float zfar) {
+void cam_update_perspective(Camera *camera, float fov, float znear, float zfar) {
     camera->fov   = fov;
     camera->znear = znear;
     camera->zfar  = zfar;
@@ -412,8 +412,8 @@ void cam_update_perspective(struct Camera *camera, float fov, float znear, float
     __cam_update_vp(camera);
 }
 
-void cam_get_mvp(mat4 mvp, struct Camera *camera, mat4 model) {
-    mat4_mult(mvp, camera->vp, model);
+void cam_get_mvp(mat4 mvp, Camera *camera, mat4 *model) {
+    mat4_mult(mvp, *model, camera->vp);
 }
 
 #endif
