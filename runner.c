@@ -50,17 +50,9 @@ void draw_call() {
 
     glUniformMatrix4fv(mvp_handle, 1, GL_FALSE, mvp);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube->vbo[TRIS]);
-    glDrawElements(GL_TRIANGLES, cube->attr[TRIS]->length * 3, GL_UNSIGNED_SHORT, 0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    int err = glGetError();
-
-    if (err != 0) {
-        printf("Error %d\n", err);
-    }
+    draw_mesh(cube);
+    unbind_program_mesh(shader, cube);
+    check_gl_error();
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {

@@ -22,6 +22,14 @@ void print_gl_log(
     free(log);
 }
 
+void check_gl_error() {
+    int err = glGetError();
+
+    if (err != 0) {
+        fprintf(stderr, "Error %d\n", err);
+    }
+}
+
 GLuint _make_shader(GLenum type, const char *filename){
     GLint length;
     GLchar *source = (GLchar*) read_file(filename, &length);

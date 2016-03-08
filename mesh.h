@@ -85,6 +85,22 @@ void bind_program_mesh(Shader *shader, Mesh *mesh) {
     }
 }
 
+void draw_mesh(Mesh *mesh) {
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->vbo[TRIS]);
+    glDrawElements(GL_TRIANGLES, mesh->attr[TRIS]->length * 3, GL_UNSIGNED_SHORT, 0);
+}
+
+void unbind_program_mesh(Shader *shader, Mesh *mesh) {
+    for (int i = 0; i < NUMBER_ATTRIBUTES; i++) {
+        if (mesh->vbo[i] != _NO_MAPPING && shader->handles[i] != _NO_MAPPING) {
+            glDisableVertexAttribArray(shader->handles[i]);
+        }
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
 void pack_vec3(list *l, float d[]) {
     for (int i = 0; i < l->length; i++) {
         d[i * 3 + 0] = ((vec3*) l->data[i])->x;
