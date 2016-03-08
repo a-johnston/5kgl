@@ -1,9 +1,14 @@
 #include <stdio.h>
+#include <math.h>
 #include "render.h"
 #include "mesh.h"
 #include <GLFW/glfw3.h>
 
-static int mvp_handle;
+GLFWwindow *window;
+float yaw = 0;
+float pitch = 0;
+
+static int mvp_handle, model_handle;
 
 static Mesh *cube;
 
@@ -18,9 +23,13 @@ static Shader *shader;
 void game_start() {
     shader = make_shader("color_vertex.glsl", "color_fragment.glsl");
     map_shader_handle(shader, VERT, "position");
+    map_shader_handle(shader, NORM, "normal");
+
     mvp_handle = glGetUniformLocation(shader->prog, "mvp");
+    model_handle = glGetUniformLocation(shader->prog, "model");
 
     cube = mesh_build_cube();
+    mesh_make_normals(cube);
     mesh_make_vbo(cube);
 
     vec3 v1 = (vec3) { 3, 3, 3 };
@@ -38,16 +47,37 @@ void step_call(double time) {
     (void) time;
     q = quat_mult(rot, q);
     quat_to_matrix(q, m);
+
+    double mx, my;
+    glfwGetCursorPos(window, &mx, &my);
+    mx -= 600;
+    my -= 600;
+    yaw   += mx / 100.0f;
+    pitch -= my / 100.0f;
+
+    float clamp = M_PI / 2.0f - 0.001f;
+
+    pitch = pitch > clamp ? clamp : (pitch < -clamp ? -clamp : pitch);
+
+    glfwSetCursorPos(window, 600, 600);
+
+    vec3 from = (vec3) {
+        5 * cos(yaw) * cos(pitch),
+        5 * sin(yaw) * cos(pitch),
+        5 * sin(pitch)
+    };
+    cam_update_view(&camera, &from, NULL, NULL);
 }
 
 void draw_call() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    cam_get_mvp(mvp, &camera, &m);
+    cam_get_mvp(mvp, &camera, m);
 
     bind_program_mesh(shader, cube);
 
     glUniformMatrix4fv(mvp_handle, 1, GL_FALSE, mvp);
+    glUniformMatrix4fv(model_handle, 1, GL_FALSE, m);
 
     draw_mesh(cube);
     unbind_program_mesh(shader, cube);
@@ -63,8 +93,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 }
 
 int main() {
-    GLFWwindow *window = make_window(0, 0, "5KGL");
+    window = make_window(0, 0, "5KGL");
     glfwSetKeyCallback(window, key_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
     
     game_start();
 

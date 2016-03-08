@@ -412,8 +412,8 @@ void cam_update_perspective(Camera *camera, float fov, float znear, float zfar) 
     __cam_update_vp(camera);
 }
 
-void cam_get_mvp(mat4 mvp, Camera *camera, mat4 *model) {
-    mat4_mult(mvp, *model, camera->vp);
+void cam_get_mvp(mat4 mvp, Camera *camera, mat4 model) {
+    mat4_mult(mvp, model, camera->vp);
 }
 
 #endif
