@@ -3,21 +3,20 @@
 #include "mesh.h"
 #include <GLFW/glfw3.h>
 
-static int program, pos_handle, mvp_handle;
+static int mvp_handle;
 
-static mesh *cube;
+static Mesh *cube;
 
 static mat4 pers, view, vp, m, mvp;
 
 static quat rot, q;
 
-void game_start() {
-    int vert = make_shader(GL_VERTEX_SHADER, "color_vertex.glsl");
-    int frag = make_shader(GL_FRAGMENT_SHADER, "color_fragment.glsl");
+Shader *shader;
 
-    program = make_program(vert, frag);
-    pos_handle = glGetAttribLocation(program, "position");
-    mvp_handle = glGetUniformLocation(program, "mvp");
+void game_start() {
+    shader = make_shader("color_vertex.glsl", "color_fragment.glsl");
+    map_shader_handle(shader, VERT, "position");
+    mvp_handle = glGetUniformLocation(shader->prog, "mvp");
 
     cube = mesh_build_cube();
     mesh_make_vbo(cube);
@@ -45,13 +44,9 @@ void step_call(double time) {
 void draw_call() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glUseProgram(program);
-
     mat4_mult(mvp, m, vp);
 
-    glBindBuffer(GL_ARRAY_BUFFER, cube->vbo[VERT]);
-    glVertexAttribPointer(pos_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(pos_handle);
+    bind_program_mesh(shader, cube);
 
     glUniformMatrix4fv(mvp_handle, 1, GL_FALSE, mvp);
 
@@ -77,7 +72,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 }
 
 int main() {
-    GLFWwindow *window = make_window(600, 400, "5KGL");
+    GLFWwindow *window = make_window(0, 0, "5KGL");
     glfwSetKeyCallback(window, key_callback);
     
     game_start();

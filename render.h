@@ -22,7 +22,7 @@ void print_gl_log(
     free(log);
 }
 
-GLuint make_shader(GLenum type, const char *filename){
+GLuint _make_shader(GLenum type, const char *filename){
     GLint length;
     GLchar *source = (GLchar*) read_file(filename, &length);
     GLuint shader;
@@ -47,7 +47,7 @@ GLuint make_shader(GLenum type, const char *filename){
     return shader;
 }
 
-GLuint make_program(GLuint vertex_shader, GLuint fragment_shader) {
+GLuint _make_program(GLuint vertex_shader, GLuint fragment_shader) {
     GLint program_ok;
 
     GLuint program = glCreateProgram();
