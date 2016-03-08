@@ -24,15 +24,8 @@ void game_start() {
 
     cube = mesh_build_cube();
 
-    float vdata[cube->verts->length * 3];
-    short tdata[cube->tris->length  * 3];
-
-    floatify_vec3(*(cube->verts), vdata);
-    floatify_ivec3(*(cube->tris), tdata);
-
-    vert_buff = make_buffer(GL_ARRAY_BUFFER, vdata, sizeof(vdata));
-
-    tris_buff = make_buffer(GL_ARRAY_BUFFER, tdata, sizeof(tdata));
+    vert_buff = make_vert_buffer(cube);
+    tris_buff = make_tri_buffer(cube);
 
     mat4_perspective(pers, 70.0f, 1.0f, 100.0f);
 
@@ -68,7 +61,7 @@ void draw_call() {
     glUniformMatrix4fv(mvp_handle, 1, GL_FALSE, mvp);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tris_buff);
-    glDrawElements(GL_TRIANGLES, cube->tris->length * 3, GL_UNSIGNED_SHORT, 0);
+    glDrawElements(GL_TRIANGLES, cube->attr[TRIS]->length * 3, GL_UNSIGNED_SHORT, 0);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

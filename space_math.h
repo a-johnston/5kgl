@@ -80,6 +80,12 @@ vec3 add_vec3(vec3 a, vec3 b) {
     };
 }
 
+void add_vec3_mutable(vec3 *a, vec3 *b) {
+    a->x += b->x;
+    a->y += b->y;
+    a->z += b->z;
+}
+
 quat add_quat(quat a, quat b) {
     return (quat) {
         a.x + b.x,
@@ -111,6 +117,12 @@ vec2 mult_vec22(vec2 a, vec2 b) {
 
 vec3 mult_vec3(vec3 a, double n) {
     return (vec3) { a.x * n, a.y * n, a.z * n };
+}
+
+void mult_vec3_mutable(vec3 *a, double n) {
+    a->x *= n;
+    a->y *= n;
+    a->z *= n;
 }
 
 vec3 mult_vec33(vec3 a, vec3 b) {
@@ -161,6 +173,11 @@ double norm_vec3(vec3 a) {
 vec3 normalize(vec3 a) {
     double n = norm_vec3(a);
     return n == 0 ? a : mult_vec3(a, 1.0 / n);
+}
+
+void normalize_mutable(vec3 *a) {
+    double n = norm_vec3(*a);
+    mult_vec3_mutable(a, 1.0 / n);
 }
 
 double norm2_quat(quat a) {

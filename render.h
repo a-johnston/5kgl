@@ -129,6 +129,7 @@ GLFWwindow* make_window(int width, int height, char *title) {
 
     glCullFace(GL_BACK);
     glEnable(GL_DEPTH_TEST);
+
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     return window;
