@@ -9,6 +9,8 @@
 #include "color.h"
 #include "util.h"
 
+const GLuint _NO_BUFFER = 0xdeadbeef;
+
 enum MeshAttribute {
     VERT = 0,
     TRIS,
@@ -39,7 +41,7 @@ void pack_vec3(list *l, float d[]) {
         d[i * 3 + 0] = ((vec3*) l->data[i])->x;
         d[i * 3 + 1] = ((vec3*) l->data[i])->y;
         d[i * 3 + 2] = ((vec3*) l->data[i])->z;
-    }   
+    }
 }
 
 void pack_ivec3(list *l, short d[]) {
@@ -47,12 +49,31 @@ void pack_ivec3(list *l, short d[]) {
         d[i * 3 + 0] = ((ivec3*) l->data[i])->i;
         d[i * 3 + 1] = ((ivec3*) l->data[i])->j;
         d[i * 3 + 2] = ((ivec3*) l->data[i])->k;
-    }   
+    }
 }
+
+void pack_color(list *l, float d[]) {
+    for (int i = 0; i < l->length; i++) {
+        d[i * 3 + 0] = ((color*) l->data[i])->r;
+        d[i * 3 + 1] = ((color*) l->data[i])->g;
+        d[i * 3 + 2] = ((color*) l->data[i])->b;
+        d[i * 3 + 3] = ((color*) l->data[i])->a;
+    }
+}
+
+// TODO : tear apart the section under this
+// ideas: hold onto type for each enumerated attrib?
+//        redo vec3, color, etc to be arrays of a known length?
 
 GLuint make_vert_buffer(mesh *m) {
     float data[m->attr[VERT]->length * 3];
     pack_vec3(m->attr[VERT], data);
+    return make_buffer(GL_ARRAY_BUFFER, data, sizeof(data));
+}
+
+GLuint make_norm_buffer(mesh *m) {
+    float data[m->attr[NORM]->length * 3];
+    pack_vec3(m->attr[NORM], data);
     return make_buffer(GL_ARRAY_BUFFER, data, sizeof(data));
 }
 
@@ -62,13 +83,41 @@ GLuint make_tri_buffer(mesh *m) {
     return make_buffer(GL_ARRAY_BUFFER, data, sizeof(data));
 }
 
+GLuint make_color_buffer(mesh *m) {
+    float data[m->attr[COLOR]->length * 4];
+    pack_vec3(m->attr[COLOR], data);
+    return make_buffer(GL_ARRAY_BUFFER, data, sizeof(data));
+}
+
 mesh* make_mesh() {
     mesh *m = (mesh*) malloc(sizeof(mesh));
     for (int i = 0; i < NUMBER_ATTRIBUTES; i++) {
         m->attr[i] = create_list();
-        m->vbo[i] = 0xdeadbeef;
+        m->vbo[i] = _NO_BUFFER;
     }
     return m;
+}
+
+GLuint _mesh_bufferer(mesh *m, int i) {
+    switch (i) {
+        case VERT:
+            return make_vert_buffer(m);
+        case NORM:
+            return make_norm_buffer(m);
+        case TRIS:
+            return make_tri_buffer(m);
+        case COLOR:
+            return make_color_buffer(m);
+    }
+    return _NO_BUFFER;
+}
+
+void mesh_make_vbo(mesh *m) {
+    for (int i = 0; i < NUMBER_ATTRIBUTES; i++) {
+        if (m->attr[i]->length > 0) {
+            m->vbo[i] = _mesh_bufferer(m, i);
+        }
+    }
 }
 
 void mesh_translate(mesh *m, vec3 v) {

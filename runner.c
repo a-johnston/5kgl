@@ -7,9 +7,6 @@ static int program, pos_handle, mvp_handle;
 
 static mesh *cube;
 
-static GLuint vert_buff;
-static GLuint tris_buff;
-
 static mat4 pers, view, vp, m, mvp;
 
 static quat rot, q;
@@ -23,9 +20,7 @@ void game_start() {
     mvp_handle = glGetUniformLocation(program, "mvp");
 
     cube = mesh_build_cube();
-
-    vert_buff = make_vert_buffer(cube);
-    tris_buff = make_tri_buffer(cube);
+    mesh_make_vbo(cube);
 
     mat4_perspective(pers, 70.0f, 1.0f, 100.0f);
 
@@ -54,13 +49,13 @@ void draw_call() {
 
     mat4_mult(mvp, m, vp);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vert_buff);
+    glBindBuffer(GL_ARRAY_BUFFER, cube->vbo[VERT]);
     glVertexAttribPointer(pos_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(pos_handle);
 
     glUniformMatrix4fv(mvp_handle, 1, GL_FALSE, mvp);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tris_buff);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube->vbo[TRIS]);
     glDrawElements(GL_TRIANGLES, cube->attr[TRIS]->length * 3, GL_UNSIGNED_SHORT, 0);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
