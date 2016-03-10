@@ -36,12 +36,12 @@ void _pass_gl_matrix_4fv(GLuint handle, int count, void *matrix) {
 
 #endif
 
-struct _uniform_data {
+typedef struct {
     GLuint handle;
     int count;
     void *data;
     _uniform_setter func;
-};
+} uniform_data;
 
 int _attrib_size[] = {3, 3, 3, 4};
 
@@ -99,8 +99,8 @@ void map_shader_attrib(Shader *shader, int attrib, char *handle) {
     }
 }
 
-void map_shader_uniform(Shader *shader, int type, char *handle, int count, void *pointer) {
-    struct _uniform_data *data = (struct _uniform_data*) malloc(sizeof(struct _uniform_data));
+uniform_data* map_shader_uniform(Shader *shader, int type, char *handle, int count, void *pointer) {
+    uniform_data *data = (uniform_data*) malloc(sizeof(uniform_data));
     data->handle = glGetUniformLocation(shader->prog, handle);
     data->count  = count;
     data->data   = pointer;
@@ -109,7 +109,10 @@ void map_shader_uniform(Shader *shader, int type, char *handle, int count, void 
         case MATRIX_4FV:
             data->func = _pass_gl_matrix_4fv;
             list_add(shader->unif, data);
+            break;
     }
+
+    return data;
 }
 
 void bind_program_mesh(Shader *shader, Mesh *mesh) {
@@ -124,7 +127,7 @@ void bind_program_mesh(Shader *shader, Mesh *mesh) {
     }
 
     for (int i = 0; i < shader->unif->length; i++) {
-        struct _uniform_data *unif = (struct _uniform_data*) list_get(shader->unif, i);
+        uniform_data *unif = (uniform_data*) list_get(shader->unif, i);
         (unif->func)(unif->handle, unif->count, unif->data);
     }
 }
