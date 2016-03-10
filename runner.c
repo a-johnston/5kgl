@@ -8,16 +8,14 @@ GLFWwindow *window;
 float yaw = 0;
 float pitch = 0;
 
+int frames;
+double lasttime;
+
 static int mvp_handle, model_handle;
-
 static Mesh *cube;
-
 static mat4 m, mvp;
-
 static Camera camera;
-
 static quat rot, q;
-
 static Shader *shader;
 
 void game_start() {
@@ -40,10 +38,25 @@ void game_start() {
 
     q = (quat) { 0.0, 0.0, 0.0, 1.0 };
     rot = quat_from_euler_angles(0.0, 0.0, 1.0);
+
+    frames = 0;
+    lasttime = -1;
 }
 
+
 void step_call(double time) {
-    (void) time;
+    if (lasttime != -1) {
+        if (time - lasttime > 1) {
+            printf("%d frames\n", frames);
+            frames = 0;
+            lasttime = time;
+        } else {
+            frames++;
+        }
+    } else {
+        lasttime = time;
+    }
+
     q = quat_mult(rot, q);
     quat_to_matrix(q, m);
 
@@ -95,6 +108,8 @@ int main() {
     window = make_window(0, 0, "5KGL");
     glfwSetKeyCallback(window, key_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+
+    set_target_framerate(0);
     
     game_start();
 

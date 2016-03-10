@@ -110,6 +110,8 @@ GLFWwindow* make_window(int width, int height, char *title) {
         height = mode->height;
     }
 
+    glfwWindowHint(GLFW_SAMPLES, 1);
+
     window = glfwCreateWindow(width, height, title, monitor, NULL);
     ar = (float) width / (float) height;
 
