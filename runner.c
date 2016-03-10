@@ -75,11 +75,8 @@ int main() {
     mesh_make_vbo(cube);
 
     //setup the camera
-    vec3 v1 = (vec3) { 3, 3, 3 };
-    vec3 v2 = (vec3) { 0, 0, 0 };
-    vec3 v3 = (vec3) { 0, 0, 1 };
-
-    cam_update_view(&camera, &v1, &v2, &v3);
+    vec3 up = (vec3) { 0, 0, 1 };
+    cam_update_view(&camera, NULL, NULL, &up);
     cam_update_perspective(&camera, 70.0f, 1.0f, 100.0f);
 
     //cube rotation matrix
