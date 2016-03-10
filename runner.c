@@ -11,7 +11,6 @@ float pitch = 0;
 int frames;
 double lasttime;
 
-static int mvp_handle, model_handle;
 static Mesh *cube;
 static mat4 m, mvp;
 static Camera camera;
@@ -20,11 +19,11 @@ static Shader *shader;
 
 void game_start() {
     shader = make_shader("color_vertex.glsl", "color_fragment.glsl");
-    map_shader_handle(shader, VERT, "position");
-    map_shader_handle(shader, NORM, "normal");
+    map_shader_attrib(shader, VERT, "position");
+    map_shader_attrib(shader, NORM, "normal");
 
-    mvp_handle = glGetUniformLocation(shader->prog, "mvp");
-    model_handle = glGetUniformLocation(shader->prog, "model");
+    map_shader_uniform(shader, MATRIX_4FV, "mvp", 1, mvp);
+    map_shader_uniform(shader, MATRIX_4FV, "model", 1, m);
 
     cube = mesh_build_cube();
     mesh_make_vbo(cube);
@@ -82,14 +81,9 @@ void step_call(double time) {
 }
 
 void draw_call() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     cam_get_mvp(mvp, &camera, m);
 
     bind_program_mesh(shader, cube);
-
-    glUniformMatrix4fv(mvp_handle, 1, GL_FALSE, mvp);
-    glUniformMatrix4fv(model_handle, 1, GL_FALSE, m);
 
     draw_mesh(cube);
     unbind_program_mesh(shader, cube);
@@ -109,8 +103,6 @@ int main() {
     glfwSetKeyCallback(window, key_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
-    set_target_framerate(0);
-    
     game_start();
 
     start_main_loop(step_call, draw_call);

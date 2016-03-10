@@ -20,9 +20,27 @@ enum MeshAttribute {
     NUMBER_ATTRIBUTES
 };
 
-struct _uniform_pair {
+enum ShaderUniformType {
+    MATRIX_4FV
+};
+
+/*
+ * GLSL Uniform setters
+ */
+
+typedef void (*_uniform_setter)(GLuint, int, void*);
+
+void _pass_gl_matrix_4fv(GLuint handle, int count, void *matrix) {
+    glUniformMatrix4fv(handle, count, GL_FALSE, *((mat4*) matrix));
+}
+
+#endif
+
+struct _uniform_data {
     GLuint handle;
-    void (*func)(GLuint, void*);
+    int count;
+    void *data;
+    _uniform_setter func;
 };
 
 int _attrib_size[] = {3, 3, 3, 4};
@@ -35,6 +53,7 @@ typedef struct {
 typedef struct {
     GLuint vert, frag, prog;
     GLuint handles[NUMBER_ATTRIBUTES];
+    list *unif;
 } Shader;
 
 unsigned int make_buffer(
@@ -63,10 +82,12 @@ Shader* make_shader(char *vertex, char *fragment) {
         shader->handles[i] = _NO_MAPPING;
     }
 
+    shader->unif = create_list();
+
     return shader;
 }
 
-void map_shader_handle(Shader *shader, int attrib, char *handle) {
+void map_shader_attrib(Shader *shader, int attrib, char *handle) {
     if (attrib == TRIS) {
         return;
     }
@@ -75,6 +96,19 @@ void map_shader_handle(Shader *shader, int attrib, char *handle) {
 
     if (temp >= 0) {
         shader->handles[attrib] = temp;
+    }
+}
+
+void map_shader_uniform(Shader *shader, int type, char *handle, int count, void *pointer) {
+    struct _uniform_data *data = (struct _uniform_data*) malloc(sizeof(struct _uniform_data));
+    data->handle = glGetUniformLocation(shader->prog, handle);
+    data->count  = count;
+    data->data   = pointer;
+
+    switch (type) {
+        case MATRIX_4FV:
+            data->func = _pass_gl_matrix_4fv;
+            list_add(shader->unif, data);
     }
 }
 
@@ -87,6 +121,11 @@ void bind_program_mesh(Shader *shader, Mesh *mesh) {
             glVertexAttribPointer(shader->handles[i], _attrib_size[i], GL_FLOAT, GL_FALSE, 0, 0);
             glEnableVertexAttribArray(shader->handles[i]);
         }
+    }
+
+    for (int i = 0; i < shader->unif->length; i++) {
+        struct _uniform_data *unif = (struct _uniform_data*) list_get(shader->unif, i);
+        (unif->func)(unif->handle, unif->count, unif->data);
     }
 }
 
@@ -305,4 +344,3 @@ void mesh_make_normals(Mesh *m) {
     }
 }
 
-#endif

@@ -161,6 +161,7 @@ void start_main_loop(
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         if (step_callback) step_callback(glfwGetTime());
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         if (draw_callback) draw_callback();
         glfwSwapBuffers(window);
     }
