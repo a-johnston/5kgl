@@ -29,7 +29,6 @@ void game_start() {
     model_handle = glGetUniformLocation(shader->prog, "model");
 
     cube = mesh_build_cube();
-    mesh_make_normals(cube);
     mesh_make_vbo(cube);
 
     vec3 v1 = (vec3) { 3, 3, 3 };

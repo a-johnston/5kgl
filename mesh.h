@@ -20,6 +20,11 @@ enum MeshAttribute {
     NUMBER_ATTRIBUTES
 };
 
+struct _uniform_pair {
+    GLuint handle;
+    void (*func)(GLuint, void*);
+};
+
 int _attrib_size[] = {3, 3, 3, 4};
 
 typedef struct {
@@ -222,6 +227,12 @@ void mesh_build_triangle(Mesh *m, vec3 *a, vec3 *b, vec3 *c) {
     tri->j = mesh_add_point(m, b);
     tri->k = mesh_add_point(m, c);
     mesh_add_tri(m, tri);
+
+    vec3 *norm = c_vec3(0, 0, 0);
+    *norm = normal_vector(a, b, c);
+    mesh_add_normal(m, norm);
+    mesh_add_normal(m, norm);
+    mesh_add_normal(m, norm);
 }
 
 void mesh_build_quad(Mesh *m, vec3 *a, vec3 *b, vec3 *c, vec3 *d) {
