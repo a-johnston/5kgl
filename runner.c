@@ -8,9 +8,6 @@ GLFWwindow *window;
 float yaw = 0;
 float pitch = 0;
 
-int frames;
-double lasttime;
-
 static Mesh *cube;
 static mat4 m, mvp;
 static Camera camera;
@@ -18,16 +15,20 @@ static quat rot, q;
 static Shader *shader;
 
 void game_start() {
+    //create shader and map variables
     shader = make_shader("color_vertex.glsl", "color_fragment.glsl");
+
     map_shader_attrib(shader, VERT, "position");
     map_shader_attrib(shader, NORM, "normal");
 
-    map_shader_uniform(shader, MATRIX_4FV, "mvp", 1, mvp);
-    map_shader_uniform(shader, MATRIX_4FV, "model", 1, m);
+    map_shader_uniform(shader, MATRIX_4FV, "mvp", 1, &mvp);
+    map_shader_uniform(shader, MATRIX_4FV, "model", 1, &m);
 
+    //make cube mesh and send data to gpu
     cube = mesh_build_cube();
     mesh_make_vbo(cube);
 
+    //setup the camera
     vec3 v1 = (vec3) { 3, 3, 3 };
     vec3 v2 = (vec3) { 0, 0, 0 };
     vec3 v3 = (vec3) { 0, 0, 1 };
@@ -35,30 +36,20 @@ void game_start() {
     cam_update_view(&camera, &v1, &v2, &v3);
     cam_update_perspective(&camera, 70.0f, 1.0f, 100.0f);
 
+    //cube rotation matrix
     q = (quat) { 0.0, 0.0, 0.0, 1.0 };
     rot = quat_from_euler_angles(0.0, 0.0, 1.0);
-
-    frames = 0;
-    lasttime = -1;
 }
 
 
 void step_call(double time) {
-    if (lasttime != -1) {
-        if (time - lasttime > 1) {
-            printf("%d frames\n", frames);
-            frames = 0;
-            lasttime = time;
-        } else {
-            frames++;
-        }
-    } else {
-        lasttime = time;
-    }
+    (void) time;
 
+    //update cube animation
     q = quat_mult(rot, q);
     quat_to_matrix(q, m);
 
+    //move camera around
     double mx, my;
     glfwGetCursorPos(window, &mx, &my);
     mx -= 600;
@@ -82,11 +73,7 @@ void step_call(double time) {
 
 void draw_call() {
     cam_get_mvp(mvp, &camera, m);
-
-    bind_program_mesh(shader, cube);
-
-    draw_mesh(cube);
-    unbind_program_mesh(shader, cube);
+    draw_mesh(shader, cube);
     check_gl_error();
 }
 
@@ -101,7 +88,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 int main() {
     window = make_window(0, 0, "5KGL");
     glfwSetKeyCallback(window, key_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
     game_start();
 

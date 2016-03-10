@@ -129,7 +129,7 @@ void bind_program_mesh(Shader *shader, Mesh *mesh) {
     }
 }
 
-void draw_mesh(Mesh *mesh) {
+void draw_mesh_tris(Mesh *mesh) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->vbo[TRIS]);
     glDrawElements(GL_TRIANGLES, mesh->attr[TRIS]->length * 3, GL_UNSIGNED_SHORT, 0);
 }
@@ -143,6 +143,12 @@ void unbind_program_mesh(Shader *shader, Mesh *mesh) {
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void draw_mesh(Shader *shader, Mesh *mesh) {
+    bind_program_mesh(shader, mesh);
+    draw_mesh_tris(mesh);
+    unbind_program_mesh(shader, mesh);
 }
 
 void pack_vec3(list *l, float d[]) {

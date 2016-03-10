@@ -115,6 +115,10 @@ GLFWwindow* make_window(int width, int height, char *title) {
     window = glfwCreateWindow(width, height, title, monitor, NULL);
     ar = (float) width / (float) height;
 
+    if (monitor) {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    }
+
     if (!window) {
         fprintf(stderr, "Failed to create window\n");
         glfwTerminate();
