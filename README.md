@@ -26,7 +26,8 @@ Hopefully coming in the future:
 - Scenes
     - Sort of up in the air since draw function is left to user
     - Pretty open ended at the moment
-- Rendering hints
-    - At the moment, way to eager to pass data that might not need to be passed every time
+- Simple physics
+    - Not looking to remake bullet or anything actually useful
+    - Just simple hull collisions and raycasting likely
 - Someone who actually knows C
     - Serious code review necessary
