@@ -41,6 +41,7 @@ typedef struct {
     int count;
     void *data;
     _uniform_setter func;
+    int hints;
 } uniform_data;
 
 int _attrib_size[] = {3, 3, 3, 4};
@@ -53,6 +54,7 @@ typedef struct {
 typedef struct {
     GLuint vert, frag, prog;
     GLuint handles[NUMBER_ATTRIBUTES];
+    GLuint draw_mode;
     list *unif;
 } Shader;
 
@@ -82,6 +84,7 @@ Shader* make_shader(char *vertex, char *fragment) {
         shader->handles[i] = _NO_MAPPING;
     }
 
+    shader->draw_mode = GL_TRIANGLES;
     shader->unif = create_list();
 
     return shader;
@@ -132,9 +135,9 @@ void bind_program_mesh(Shader *shader, Mesh *mesh) {
     }
 }
 
-void draw_mesh_tris(Mesh *mesh) {
+void draw_mesh_tris(Shader *shader, Mesh *mesh) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->vbo[TRIS]);
-    glDrawElements(GL_TRIANGLES, mesh->attr[TRIS]->length * 3, GL_UNSIGNED_SHORT, 0);
+    glDrawElements(shader->draw_mode, mesh->attr[TRIS]->length * 3, GL_UNSIGNED_SHORT, 0);
 }
 
 void unbind_program_mesh(Shader *shader, Mesh *mesh) {
@@ -150,7 +153,7 @@ void unbind_program_mesh(Shader *shader, Mesh *mesh) {
 
 void draw_mesh(Shader *shader, Mesh *mesh) {
     bind_program_mesh(shader, mesh);
-    draw_mesh_tris(mesh);
+    draw_mesh_tris(shader, mesh);
     unbind_program_mesh(shader, mesh);
 }
 
