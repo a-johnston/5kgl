@@ -5,30 +5,14 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "space_math.c"
+#include "5kgl.h"
 #include "color.c"
 #include "util.c"
 #include "render.c"
 
-const GLuint _NO_MAPPING = 0xdeadbeef;
-
-enum MeshAttribute {
-    VERT = 0,
-    TRIS,
-    NORM,
-    COLOR,
-    NUMBER_ATTRIBUTES
-};
-
-enum ShaderUniformType {
-    MATRIX_4FV
-};
-
 /*
  * GLSL Uniform setters
  */
-
-typedef void (*_uniform_setter)(GLuint, int, void*);
 
 void _pass_gl_matrix_4fv(GLuint handle, int count, void *matrix) {
     glUniformMatrix4fv(handle, count, GL_FALSE, *((mat4*) matrix));
@@ -36,29 +20,9 @@ void _pass_gl_matrix_4fv(GLuint handle, int count, void *matrix) {
 
 #endif
 
-typedef struct {
-    GLuint handle;
-    int count;
-    void *data;
-    _uniform_setter func;
-    int hints;
-} uniform_data;
-
 int _attrib_size[] = {3, 3, 3, 4};
 
-typedef struct {
-    list *attr[NUMBER_ATTRIBUTES];
-    GLuint vbo[NUMBER_ATTRIBUTES];
-} Mesh;
-
-typedef struct {
-    GLuint vert, frag, prog;
-    GLuint handles[NUMBER_ATTRIBUTES];
-    GLuint draw_mode;
-    list *unif;
-} Shader;
-
-unsigned int make_buffer(
+GLuint make_buffer(
     GLenum target,
     const void *buffer_data,
     GLsizei buffer_size
@@ -118,7 +82,7 @@ uniform_data* map_shader_uniform(Shader *shader, int type, char *handle, int cou
     return data;
 }
 
-void bind_program_mesh(Shader *shader, Mesh *mesh) {
+void _bind_program_mesh(Shader *shader, Mesh *mesh) {
     glUseProgram(shader->prog);
 
     for (int i = 0; i < NUMBER_ATTRIBUTES; i++) {
@@ -135,12 +99,12 @@ void bind_program_mesh(Shader *shader, Mesh *mesh) {
     }
 }
 
-void draw_mesh_tris(Shader *shader, Mesh *mesh) {
+void _draw_mesh_tris(Shader *shader, Mesh *mesh) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->vbo[TRIS]);
     glDrawElements(shader->draw_mode, mesh->attr[TRIS]->length * 3, GL_UNSIGNED_SHORT, 0);
 }
 
-void unbind_program_mesh(Shader *shader, Mesh *mesh) {
+void _unbind_program_mesh(Shader *shader, Mesh *mesh) {
     for (int i = 0; i < NUMBER_ATTRIBUTES; i++) {
         if (mesh->vbo[i] != _NO_MAPPING && shader->handles[i] != _NO_MAPPING) {
             glDisableVertexAttribArray(shader->handles[i]);
@@ -152,9 +116,9 @@ void unbind_program_mesh(Shader *shader, Mesh *mesh) {
 }
 
 void draw_mesh(Shader *shader, Mesh *mesh) {
-    bind_program_mesh(shader, mesh);
-    draw_mesh_tris(shader, mesh);
-    unbind_program_mesh(shader, mesh);
+    _bind_program_mesh(shader, mesh);
+    _draw_mesh_tris(shader, mesh);
+    _unbind_program_mesh(shader, mesh);
 }
 
 void pack_vec3(list *l, float d[]) {
@@ -219,18 +183,15 @@ Mesh* make_mesh() {
     return m;
 }
 
+_attrib_buffer_maker _buffer_maker[] = {
+    make_vert_buffer,
+    make_tri_buffer,
+    make_norm_buffer,
+    make_color_buffer
+};
+
 GLuint _mesh_bufferer(Mesh *m, int i) {
-    switch (i) {
-        case VERT:
-            return make_vert_buffer(m);
-        case NORM:
-            return make_norm_buffer(m);
-        case TRIS:
-            return make_tri_buffer(m);
-        case COLOR:
-            return make_color_buffer(m);
-    }
-    return _NO_MAPPING;
+    return _buffer_maker[i](m);
 }
 
 void mesh_make_vbo(Mesh *m) {
@@ -313,7 +274,7 @@ Mesh* mesh_build_cube() {
     return m;
 }
 
-Mesh* mesh_build_test() {
+Mesh* mesh_build_plane() {
     vec3 *p0 = c_vec3(-0.5, -0.5, 0);
     vec3 *p1 = c_vec3( 0.5, -0.5, 0);
     vec3 *p2 = c_vec3(-0.5,  0.5, 0);

@@ -335,34 +335,8 @@ void mat4_look_at(mat4 matrix, vec3 from, vec3 to, vec3 up) {
 }
 
 /*
- * Combination
- */
-
-#define lincomb(a, b, i, j) _Generic((a, b, i, j), \
-    default: add(mult(a, i), mult(b, j)))
-
-#define lerp(a, b, i) _Generic((a, b, i), \
-    default: lincomb(a, b, i, 1 - i))
-
-/*
- * Other helpers
- */
-
-#define dist(a, b) _Generic((a, b), norm2(add(a, mult(b, -1.0))))
-
-/*
  * Camera helpers
  */
-
-typedef struct {
-    float fov, znear, zfar;
-    vec3 from;
-    vec3 to;
-    vec3 up;
-    mat4 v;
-    mat4 p;
-    mat4 vp;
-} Camera;
 
 void __cam_update_vp(Camera *camera) {
     mat4_mult(camera->vp, camera->v, camera->p);

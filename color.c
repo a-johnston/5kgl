@@ -3,27 +3,7 @@
 #define __5kGL_COLOR
 
 #include <math.h>
-
-typedef struct {
-    float r;
-    float g;
-    float b;
-    float a;
-} color;
-
-static const color COLOR_WHITE = { 1.0f, 1.0f, 1.0f, 1.0f };
-const color COLOR_BLACK = { 0.0f, 0.0f, 0.0f, 1.0f };
-const color COLOR_RED   = { 1.0f, 0.0f, 0.0f, 1.0f };
-const color COLOR_GREEN = { 0.0f, 1.0f, 0.0f, 1.0f };
-const color COLOR_BLUE  = { 0.0f, 0.0f, 1.0f, 1.0f };
-
-const color COLOR_YELLOW = { 1.0f, 1.0f, 0.0f, 1.0f };
-const color COLOR_PURPLE = { 1.0f, 0.0f, 1.0f, 1.0f };
-const color COLOR_CYAN   = { 0.0f, 1.0f, 1.0f, 1.0f };
-const color COLOR_BLANK  = { 0.0f, 0.0f, 0.0f, 0.0f };
-
-
-
+#include "5kgl.h"
 
 color color_interpolate(color a, color b, float i) {
     float j = 1 - i;
