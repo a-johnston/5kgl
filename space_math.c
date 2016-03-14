@@ -7,8 +7,6 @@
 
 #include "5kgl.h"
 
-#include "render.c"
-
 double deg_to_rad = M_PI / 180.0;
 
 /*

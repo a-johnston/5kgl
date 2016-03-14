@@ -2,7 +2,9 @@
 
 #define __5kgl
 
+#include <GL/glew.h>
 #include <GL/gl.h>
+#include <GLFW/glfw3.h>
 #include "util.c"
 
 /*
@@ -273,5 +275,27 @@ Mesh* mesh_build_cube();
 Mesh* mesh_build_plane();
 
 void mesh_make_normals(Mesh*);
+
+/*
+ * render.c
+ */
+
+void print_gl_log(GLuint, PFNGLGETSHADERIVPROC, PFNGLGETSHADERINFOLOGPROC);
+
+void check_gl_error();
+
+GLuint _make_shader(GLenum, const char*);
+
+GLuint _make_program(GLuint, GLuint);
+
+void resize_callback(GLFWwindow*, int, int);
+
+float get_aspect_ratio();
+
+GLFWwindow* make_window(int, int, char*);
+
+void set_target_framerate(int);
+
+void start_main_loop(void (*) (double), void (*) ());
 
 #endif
