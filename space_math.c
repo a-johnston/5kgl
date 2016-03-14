@@ -5,31 +5,11 @@
 #include <math.h>
 #include <string.h>
 
+#include "5kgl.h"
+
 #include "render.c"
 
 double deg_to_rad = M_PI / 180.0;
-
-/*
- * Types for 2D and 3D space operations
- */
-
-typedef struct {
-    double x, y;
-} vec2;
-
-typedef struct {
-    double x, y, z;
-} vec3;
-
-typedef struct {
-    int i, j, k;
-} ivec3;
-
-typedef struct {
-    double x, y, z, w;
-} quat;
-
-typedef float mat4[16];
 
 /*
  * Constructors
