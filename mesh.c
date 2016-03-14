@@ -5,10 +5,10 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "space_math.h"
-#include "color.h"
-#include "util.h"
-#include "render.h"
+#include "space_math.c"
+#include "color.c"
+#include "util.c"
+#include "render.c"
 
 const GLuint _NO_MAPPING = 0xdeadbeef;
 

@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "util.h"
+#include "util.c"
 
 void print_gl_log(
     GLuint object,

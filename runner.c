@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <math.h>
-#include "render.h"
-#include "mesh.h"
-#include "physics.h"
+#include "render.c"
+#include "mesh.c"
 #include <GLFW/glfw3.h>
 
 GLFWwindow *window;
