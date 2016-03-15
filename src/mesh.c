@@ -2,13 +2,7 @@
 
 #define __MESH_UTIL
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
 #include "5kgl.h"
-#include "color.c"
-#include "util.c"
-#include "render.c"
 
 /*
  * GLSL Uniform setters

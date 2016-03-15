@@ -1,4 +1,6 @@
 *.bin
 *.out
 *.swp
+*.o
+*.gch
 bin/*

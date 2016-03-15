@@ -2,11 +2,7 @@
 
 #define __RENDER_UTIL
 
-#include <stdio.h>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include "5kgl.h"
-#include "util.c"
 
 void print_gl_log(
     GLuint object,

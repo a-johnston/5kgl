@@ -2,9 +2,6 @@
 
 #define __SPACE_MATH
 
-#include <math.h>
-#include <string.h>
-
 #include "5kgl.h"
 
 double deg_to_rad = M_PI / 180.0;

@@ -2,10 +2,43 @@
 
 #define __5kgl
 
+#include <math.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
-#include "util.c"
+
+/*
+ * util.c
+ */
+
+#define DEFAULT_LIST_CAPACITY 20
+
+typedef struct {
+    void **data;
+    int capacity;
+    int length;
+} list;
+
+list* create_list();
+
+int list_add(list*, void*);
+
+void* list_insert(list*, void*, int);
+
+void* list_get(list*, int);
+
+int list_find(list*, void*);
+
+void* list_remove(list*, int);
+
+void list_clear(list*);
+
+void list_free(list *l);
+
+void* read_file(const char*, int*);
 
 /*
  * space_math.c

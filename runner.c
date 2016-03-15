@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <math.h>
-#include "render.c"
-#include "mesh.c"
+#include "5kgl.h"
 #include <GLFW/glfw3.h>
 
 GLFWwindow *window;
