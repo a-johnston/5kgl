@@ -2,16 +2,7 @@
 
 #define __GL5K_UTIL
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#define DEFAULT_LIST_CAPACITY 20
-
-typedef struct {
-    void **data;
-    int capacity;
-    int length;
-} list;
+#include "5kgl.h"
 
 list* create_list() {
     list* l = (list*) malloc(sizeof(list));

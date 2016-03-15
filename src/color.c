@@ -2,7 +2,6 @@
 
 #define __5kGL_COLOR
 
-#include <math.h>
 #include "5kgl.h"
 
 color color_interpolate(color a, color b, float i) {
