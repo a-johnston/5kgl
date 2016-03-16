@@ -18,6 +18,7 @@ void step_call(double time) {
     //update cube animation
     q = quat_mult(rot, q);
     quat_to_matrix(q, m);
+    mat4_translate(m, 2.0f * cos(time), 2.0f * sin(time), 0.0f);
 
     //move camera around
     double mx, my;
