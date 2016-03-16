@@ -2,6 +2,7 @@
 
 #define __5kgl_h
 
+#include <alloca.h>
 #include <math.h>
 #include <string.h>
 #include <stdio.h>

@@ -117,26 +117,26 @@ void draw_mesh(Shader *shader, Mesh *mesh) {
 
 void pack_vec3(list *l, float d[]) {
     for (int i = 0; i < l->length; i++) {
-        d[i * 3 + 0] = ((vec3*) l->data[i])->x;
-        d[i * 3 + 1] = ((vec3*) l->data[i])->y;
-        d[i * 3 + 2] = ((vec3*) l->data[i])->z;
+        d[i * 3 + 0] = (float) ((vec3*) l->data[i])->x;
+        d[i * 3 + 1] = (float) ((vec3*) l->data[i])->y;
+        d[i * 3 + 2] = (float) ((vec3*) l->data[i])->z;
     }
 }
 
 void pack_ivec3(list *l, short d[]) {
     for (int i = 0; i < l->length; i++) {
-        d[i * 3 + 0] = ((ivec3*) l->data[i])->i;
-        d[i * 3 + 1] = ((ivec3*) l->data[i])->j;
-        d[i * 3 + 2] = ((ivec3*) l->data[i])->k;
+        d[i * 3 + 0] = (short) ((ivec3*) l->data[i])->i;
+        d[i * 3 + 1] = (short) ((ivec3*) l->data[i])->j;
+        d[i * 3 + 2] = (short) ((ivec3*) l->data[i])->k;
     }
 }
 
 void pack_color(list *l, float d[]) {
     for (int i = 0; i < l->length; i++) {
-        d[i * 3 + 0] = ((color*) l->data[i])->r;
-        d[i * 3 + 1] = ((color*) l->data[i])->g;
-        d[i * 3 + 2] = ((color*) l->data[i])->b;
-        d[i * 3 + 3] = ((color*) l->data[i])->a;
+        d[i * 3 + 0] = (float) ((color*) l->data[i])->r;
+        d[i * 3 + 1] = (float) ((color*) l->data[i])->g;
+        d[i * 3 + 2] = (float) ((color*) l->data[i])->b;
+        d[i * 3 + 3] = (float) ((color*) l->data[i])->a;
     }
 }
 
@@ -145,34 +145,38 @@ void pack_color(list *l, float d[]) {
 //        redo vec3, color, etc to be arrays of a known length?
 
 GLuint make_vert_buffer(Mesh *m) {
-    float data[m->attr[VERT]->length * 3];
+    int size = m->attr[VERT]->length * 3 * sizeof(float);
+    float *data = alloca(size);
     pack_vec3(m->attr[VERT], data);
-    return make_buffer(GL_ARRAY_BUFFER, data, sizeof(data));
+    return make_buffer(GL_ARRAY_BUFFER, data, size);
 }
 
 GLuint make_norm_buffer(Mesh *m) {
-    float data[m->attr[NORM]->length * 3];
+    int size = m->attr[NORM]->length * 3 * sizeof(float);
+    float *data = alloca(size);
     pack_vec3(m->attr[NORM], data);
-    return make_buffer(GL_ARRAY_BUFFER, data, sizeof(data));
+    return make_buffer(GL_ARRAY_BUFFER, data, size);
 }
 
 GLuint make_tri_buffer(Mesh *m) {
-    short data[m->attr[TRIS]->length * 3];
+    int size = m->attr[TRIS]->length * 3 * sizeof(short);
+    short *data = alloca(size);
     pack_ivec3(m->attr[TRIS], data);
-    return make_buffer(GL_ARRAY_BUFFER, data, sizeof(data));
+    return make_buffer(GL_ARRAY_BUFFER, data, size);
 }
 
 GLuint make_color_buffer(Mesh *m) {
-    float data[m->attr[COLOR]->length * 4];
-    pack_vec3(m->attr[COLOR], data);
-    return make_buffer(GL_ARRAY_BUFFER, data, sizeof(data));
+    int size = m->attr[COLOR]->length * 4 * sizeof(float);
+    float *data = alloca(size);
+    pack_color(m->attr[COLOR], data);
+    return make_buffer(GL_ARRAY_BUFFER, data, size);
 }
 
 Mesh* make_mesh() {
     Mesh *m = (Mesh*) malloc(sizeof(Mesh));
     for (int i = 0; i < NUMBER_ATTRIBUTES; i++) {
         m->attr[i] = create_list();
-        m->vbo[i] = _NO_MAPPING;
+        m->vbo[i]  = _NO_MAPPING;
     }
     return m;
 }

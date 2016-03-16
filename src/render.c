@@ -97,6 +97,11 @@ GLFWwindow* make_window(int width, int height, char *title) {
     if (width < 1 && height < 1) {
         monitor = glfwGetPrimaryMonitor();
 
+        if (!monitor) {
+            fprintf(stderr, "Failed to get monitor!\n");
+            exit(EXIT_FAILURE);
+        }
+
         const GLFWvidmode *mode = glfwGetVideoMode(monitor);
         glfwWindowHint(GLFW_RED_BITS, mode->redBits);
         glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);

@@ -312,17 +312,17 @@ void mat4_look_at(mat4 matrix, vec3 from, vec3 to, vec3 up) {
     s = normalize(s);
     vec3 u = cross(s, f);
 
-    matrix[0] = s.x;
-    matrix[1] = u.x;
-    matrix[2] = -f.x;
+    matrix[0]  = (float)  s.x;
+    matrix[1]  = (float)  u.x;
+    matrix[2]  = (float) -f.x;
 
-    matrix[4] = s.y;
-    matrix[5] = u.y;
-    matrix[6] = -f.y;
+    matrix[4]  = (float)  s.y;
+    matrix[5]  = (float)  u.y;
+    matrix[6]  = (float) -f.y;
 
-    matrix[8] = s.z;
-    matrix[9] = u.z;
-    matrix[10] = -f.z;
+    matrix[8]  = (float)  s.z;
+    matrix[9]  = (float)  u.z;
+    matrix[10] = (float) -f.z;
 
     matrix[15] = 1.0f;
 
