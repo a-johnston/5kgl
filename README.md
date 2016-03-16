@@ -1,7 +1,25 @@
-## 5KGL
+# 5KGL
 More or less the suite of features I would want on hand if I were to ever develop a game in OpenGl. Built to be small and portable and hopefully pretty quick.
 
-Originally written for HackCWRU 2016.
+Originally written for HackCWRU 2016. Beerware 2016.
+
+### Building and running
+This project requires the headers and libraries for OpenGL, GLEW, and GLFW.
+
+A demo is included, demo.c, along with a makefile. The makefile currently supports building and installing on linux.
+
+To build and install the library, run from the root directory of the project:
+```bash
+make
+sudo make install
+```
+
+Then to run the demo,
+```bash
+./demo.bin
+```
+
+Bam! You should have a demo.
 
 Currently implemented:
 - Shaders
