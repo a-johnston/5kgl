@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <math.h>
-#include "5kgl.h"
+#include <5kgl.h>
 #include <GLFW/glfw3.h>
 
 GLFWwindow *window;

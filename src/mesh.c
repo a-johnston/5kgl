@@ -12,7 +12,7 @@ void _pass_gl_matrix_4fv(GLuint handle, int count, void *matrix) {
     glUniformMatrix4fv(handle, count, GL_FALSE, *((mat4*) matrix));
 }
 
-#endif
+const GLuint _NO_MAPPING = 0xdeadbeef;
 
 int _attrib_size[] = {3, 3, 3, 4};
 
@@ -311,3 +311,4 @@ void mesh_make_normals(Mesh *m) {
     }
 }
 
+#endif

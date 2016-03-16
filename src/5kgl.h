@@ -1,6 +1,6 @@
-#ifndef __5kgl
+#ifndef __5kgl_h
 
-#define __5kgl
+#define __5kgl_h
 
 #include <math.h>
 #include <string.h>
@@ -166,8 +166,6 @@ typedef struct {
     mat4 v, p, vp;
 } Camera;
 
-void __cam_update_vp(Camera*);
-
 void cam_update_view(Camera*, vec3*, vec3*, vec3*);
 
 void cam_update_perspective(Camera*, float, float, float);
@@ -182,17 +180,6 @@ typedef struct {
     float r, g, b, a;
 } color;
 
-const color COLOR_WHITE = { 1.0f, 1.0f, 1.0f, 1.0f };
-const color COLOR_BLACK = { 0.0f, 0.0f, 0.0f, 1.0f };
-const color COLOR_RED   = { 1.0f, 0.0f, 0.0f, 1.0f };
-const color COLOR_GREEN = { 0.0f, 1.0f, 0.0f, 1.0f };
-const color COLOR_BLUE  = { 0.0f, 0.0f, 1.0f, 1.0f };
-
-const color COLOR_YELLOW = { 1.0f, 1.0f, 0.0f, 1.0f };
-const color COLOR_PURPLE = { 1.0f, 0.0f, 1.0f, 1.0f };
-const color COLOR_CYAN   = { 0.0f, 1.0f, 1.0f, 1.0f };
-const color COLOR_BLANK  = { 0.0f, 0.0f, 0.0f, 0.0f };
-
 color color_interpolate(color, color, float);
 
 color color_from_HSV(float, float, float);
@@ -200,8 +187,6 @@ color color_from_HSV(float, float, float);
 /*
  * mesh.c
  */
-
-const GLuint _NO_MAPPING = 0xdeadbeef;
 
 enum MeshAttribute {
     VERT = 0,
@@ -218,8 +203,6 @@ enum ShaderUniformType {
 // shader uniform setter impl
 
 typedef void (*_uniform_setter)(GLuint, int, void*);
-
-void _pass_gl_matrix_4fv(GLuint, int, void*);
 
 // type definitions
 
@@ -255,12 +238,6 @@ uniform_data* map_shader_uniform(Shader*, int, char*, int, void*);
 
 // rendering
 
-void _bind_program_mesh(Shader*, Mesh*);
-
-void _draw_mesh_tris(Shader*, Mesh*);
-
-void _unbind_program_mesh(Shader*, Mesh*);
-
 void draw_mesh(Shader*, Mesh*);
 
 // mesh construction, buffer packing and VBO busing
@@ -282,8 +259,6 @@ GLuint make_tri_buffer(Mesh*);
 GLuint make_color_buffer(Mesh*);
 
 Mesh* make_mesh();
-
-GLuint _mesh_bufferer(Mesh*, int);
 
 void mesh_make_vbo(Mesh*);
 
