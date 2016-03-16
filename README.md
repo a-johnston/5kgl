@@ -14,8 +14,9 @@ make
 sudo make install
 ```
 
-Then to run the demo,
+Then to build and run the demo,
 ```bash
+make demo
 ./demo.bin
 ```
 
