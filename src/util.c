@@ -46,7 +46,7 @@ int list_find(list *l, void *value) {
 
 void* list_remove(list *l, int i) {
     void *temp = l->data[i];
-    for (int i = i; i < l->length - 1; i++) {
+    for (; i < l->length - 1; i++) {
         l->data[i] = l->data[i + 1];
     }
     l->data[l->length - 1] = NULL;

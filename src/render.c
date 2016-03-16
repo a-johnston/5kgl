@@ -148,7 +148,7 @@ GLFWwindow* make_window(int width, int height, char *title) {
 
 void set_target_framerate(int fps) {
     if (fps > 0) {
-        glfwSwapInterval(60.0f / fps);
+        glfwSwapInterval(60 / fps);
     } else {
         glfwSwapInterval(0);
     }
