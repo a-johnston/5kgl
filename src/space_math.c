@@ -228,7 +228,7 @@ quat quat_mult(quat a, quat b) {
 }
 
 vec3 quat_transform(quat q, vec3 v) {
-    quat qv = (quat) { v.x, v.y, v.z, 0.0f };
+    quat qv = (quat) { v.x, v.y, v.z, 0.0 };
     qv = quat_mult(q, quat_mult(qv, quat_conjugate(q)));
     return (vec3) { q.x, q.y, q.z };
 }
@@ -265,10 +265,10 @@ void mat4_zero(mat4 m) {
 
 void mat4_id(mat4 dest) {
     mat4_zero(dest);
-    dest[0]  = 1;
-    dest[5]  = 1;
-    dest[10] = 1;
-    dest[15] = 1;
+    dest[0]  = 1.0f;
+    dest[5]  = 1.0f;
+    dest[10] = 1.0f;
+    dest[15] = 1.0f;
 }
 
 void mat4_mult(mat4 dest, mat4 left, mat4 right) {
@@ -289,7 +289,7 @@ void mat4_translate(mat4 m, float x, float y, float z) {
 }
 
 void mat4_perspective(mat4 matrix, float fov, float near, float far) {
-    float f = 1.0f / tan(fov * deg_to_rad / 2.0);
+   float f = (float) (1.0 / tan(fov * deg_to_rad / 2.0));
     float frustum = near - far;
 
     mat4_zero(matrix);
