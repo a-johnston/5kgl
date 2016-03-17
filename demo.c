@@ -57,11 +57,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 }
 
 int main() {
-    window = make_window(0, 0, "5KGL");
+    // create a fullscreen window
+    window = make_window(-1, -1, "5KGL");
     glfwSetKeyCallback(window, key_callback);
 
-    //create shader and map variables
-    shader = make_shader("color_vertex.glsl", "color_fragment.glsl");
+    // create shader and map variables
+    shader = make_shader("assets/color_vertex.glsl", "assets/color_fragment.glsl");
 
     map_shader_attrib(shader, VERT, "position");
     map_shader_attrib(shader, NORM, "normal");
@@ -69,19 +70,20 @@ int main() {
     map_shader_uniform(shader, MATRIX_4FV, "mvp", 1, &mvp);
     map_shader_uniform(shader, MATRIX_4FV, "model", 1, &m);
 
-    //make cube mesh and send data to gpu
+    // make cube mesh and send data to gpu
     cube = mesh_build_cube();
     mesh_make_vbo(cube);
 
-    //setup the camera
+    // setup the camera
     vec3 up = (vec3) { 0, 0, 1 };
     cam_update_view(&camera, NULL, NULL, &up);
     cam_update_perspective(&camera, 70.0f, 1.0f, 100.0f);
 
-    //cube rotation matrix
+    // cube rotation matrix
     q = (quat) { 0.0, 0.0, 0.0, 1.0 };
     rot = quat_from_euler_angles(0.0, 0.0, 1.0);
 
     start_main_loop(step_call, draw_call);
-    return 0;
+
+    return EXIT_SUCCESS;
 }
