@@ -326,7 +326,7 @@ void mat4_look_at(mat4 matrix, vec3 from, vec3 to, vec3 up) {
 
     matrix[15] = 1.0f;
 
-    mat4_translate(matrix, -from.x, -from.y, -from.z);
+    mat4_translate(matrix, (float) -from.x, (float) -from.y, (float) -from.z);
 }
 
 /*

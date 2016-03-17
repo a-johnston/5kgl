@@ -25,10 +25,10 @@ void step_call(double time) {
     glfwGetCursorPos(window, &mx, &my);
     mx -= 600;
     my -= 600;
-    yaw   += mx / 100.0f;
-    pitch -= my / 100.0f;
+    yaw   += (float) mx / 100.0f;
+    pitch -= (float) my / 100.0f;
 
-    float clamp = M_PI / 2.0f - 0.001f;
+    float clamp = (float) M_PI / 2.0f - 0.001f;
 
     pitch = pitch > clamp ? clamp : (pitch < -clamp ? -clamp : pitch);
 
