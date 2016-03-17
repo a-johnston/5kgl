@@ -312,8 +312,6 @@ float get_aspect_ratio();
 
 GLFWwindow* make_window(int, int, char*);
 
-void set_target_framerate(int);
-
 void start_main_loop(void (*) (double), void (*) ());
 
 #endif
