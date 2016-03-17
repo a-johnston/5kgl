@@ -2,7 +2,12 @@
 
 #define __5kgl_h
 
+#ifdef _WIN32
+#define alloca(x) _alloca(x)
+#else
 #include <alloca.h>
+#endif
+
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
@@ -10,6 +15,8 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
+
+#define M_PI 3.141592653589793
 
 /*
  * util.c
