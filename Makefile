@@ -1,7 +1,7 @@
-build: src/*
+build: src/5kgl.h src/*.c
 	cp src/5kgl.h include/5kgl.h
 	cd bin/; \
-	gcc -fpic -Os -c ../src/* ;\
+	gcc -fpic -Os -c ../src/*.c ;\
 	gcc -shared -fpic -o ../lib/lib5kgl.so *.o -lc
 
 install: lib/* include/*

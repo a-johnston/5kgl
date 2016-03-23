@@ -14,18 +14,32 @@ list* create_list() {
     return l;
 }
 
-int list_add(list *l, void *value) {
-    if (l->length >= l->capacity) {
-        l->capacity += DEFAULT_LIST_CAPACITY;
+void _ensure_capacity(list *l, int length, int buffer) {
+    if (l->capacity < length) {
+        l->capacity = length + buffer;
         l->data = (void**) realloc(l->data, sizeof(void*) * l->capacity);
     }
+}
 
+int list_add(list *l, void *value) {
+    _ensure_capacity(l, l->length, DEFAULT_LIST_CAPACITY);
     l->data[l->length] = value;
     l->length += 1;
     return l->length - 1;
 }
 
+void list_add_all(list *l, list *other) {
+    _ensure_capacity(l, l->length + other->length, 0);
+
+    for (int i = 0; i < other->length; i++) {
+        l->data[l->length + i] = other->data[i];
+    }
+    
+    l->length += other->length;
+}
+
 void* list_insert(list *l, void *value, int i) {
+    _ensure_capacity(l, i, 0);
     void *temp = l->data[i];
     l->data[i] = value;
     return temp;
