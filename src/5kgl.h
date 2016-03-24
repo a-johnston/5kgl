@@ -36,6 +36,8 @@ list* create_list();
 
 int list_add(list*, void*);
 
+void list_add_all(list*, list*);
+
 void* list_insert(list*, void*, int);
 
 void* list_get(list*, int);
@@ -207,7 +209,8 @@ enum MeshAttribute {
 };
 
 enum ShaderUniformType {
-    MATRIX_4FV
+    MATRIX_4FV,
+    VECTOR_3FV
 };
 
 // shader uniform setter impl

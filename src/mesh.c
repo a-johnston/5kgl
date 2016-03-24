@@ -215,6 +215,12 @@ void mesh_scale(Mesh *m, double n) {
     }
 }
 
+void mesh_add_mesh(Mesh *m, Mesh *toAdd) {
+    for (int i = 0; i < NUMBER_ATTRIBUTES; i++) {
+        list_add_all(m->attr[i], toAdd->attr[i]);
+    }
+}
+
 int mesh_add_point(Mesh *m, vec3 *p) {
     return list_add(m->attr[VERT], p);
 }
