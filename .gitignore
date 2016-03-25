@@ -4,6 +4,7 @@
 *.o
 *.gch
 bin/*
+docs/*
 include/*
 lib/*
 CMakeCache.txt
