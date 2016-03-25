@@ -8,7 +8,7 @@ install: lib/lib5kgl.so include/5kgl.h
 	sudo cp lib/lib5kgl.so /usr/local/lib/
 	sudo cp include/5kgl.h /usr/local/include/
 
-docs:
+docs: src/* Doxyfile
 	doxygen Doxyfile
 
 demo: demo.c
