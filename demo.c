@@ -45,7 +45,7 @@ int main() {
     mesh_make_vbo(cube);
 
     // setup the camera
-    vec3 from = (vec3) { 3, 3, 3 };
+    vec3 from = (vec3) { 2, 2, 2 };
     vec3 to   = (vec3) { 0, 0, 0 };
     vec3 up   = (vec3) { 0, 0, 1 };
     cam_update_view(&camera, &from, &to, &up);
@@ -53,7 +53,7 @@ int main() {
 
     // cube rotation matrix
     q = (quat) { 0.0, 0.0, 0.0, 1.0 };
-    rot = quat_from_euler_angles(0.0, 0.0, 1.0);
+    rot = quat_from_euler_angles(0.1, 0.5, 1.0);
 
     start_main_loop(step_call, draw_call);
 
