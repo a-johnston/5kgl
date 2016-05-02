@@ -319,4 +319,10 @@ GLFWwindow* make_window(int, int, char*);
 
 void start_main_loop(void (*) (double), void (*) ());
 
+// extra util stuff
+
+list* read_lines(const char *filename);
+
+Mesh* read_obj(const char *filename);
+
 #endif

@@ -123,4 +123,39 @@ void* read_file(const char *filename, int *length) {
     return buffer;
 }
 
+list* read_lines(const char *filename) {
+    int length;
+    void *buffer = read_file(filename, &length);
+    list *l = split_string((char*) buffer, "\n");
+    list_remove(l, l->length - 1); // TODO this might be garbage, but files should end with newline
+    free(buffer);
+    return l;
+}
+
+Mesh* read_obj(const char *filename) {
+    Mesh *mesh = make_mesh();
+
+    list *lines = read_lines(filename);
+    for (int i = 0; i < lines->length; i++) {
+        list *parts = split_string(list_get(lines, i), " ");
+
+        char *tag = (char*) list_get(parts, 0);
+
+        if (strcmp("v", tag) == 0) {
+
+        } else if (strcmp("vt", tag) == 0) {
+
+        } else if (strcmp("vn", tag) == 0) {
+
+        } else if (strcmp("f", tag) == 0) {
+
+        }
+
+        list_free(parts);
+    }
+    list_free(lines);
+
+    return mesh;
+}
+
 #endif
