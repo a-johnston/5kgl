@@ -1,5 +1,5 @@
 # 5KGL
-More or less the suite of features I would want on hand if I were to ever develop a game in OpenGl. Built to be small and portable and hopefully pretty quick.
+More or less the suite of features I would want on hand if I were to ever develop a game in OpenGL. Built to be small and portable and hopefully pretty quick.
 
 Originally written for HackCWRU 2016. Beerware 2016.
 
