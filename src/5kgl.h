@@ -32,6 +32,8 @@ typedef struct {
     int length;
 } list;
 
+list* split_string(char*, char*);
+
 list* create_list();
 
 int list_add(list*, void*);

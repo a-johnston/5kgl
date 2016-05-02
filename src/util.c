@@ -4,6 +4,20 @@
 
 #include "5kgl.h"
 
+list* split_string(char *str, char *pattern) {
+    list *l = create_list();
+
+    char *copy = strdup(str);
+    char *substr;
+    while ((substr = strsep(&copy, pattern))) {
+        list_add(l, substr);
+    }
+
+    free(copy);
+
+    return l;
+}
+
 list* create_list() {
     list* l = (list*) malloc(sizeof(list));
 

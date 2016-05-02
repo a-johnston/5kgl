@@ -14,3 +14,6 @@ docs: src/* Doxyfile
 
 demo: demo.c
 	cc -o demo.bin demo.c -O3 -Wall -Werror -Wextra -Wpedantic -l5kgl -lglfw -lGL -lGLEW -lX11 -lXrandr -lXi -lXxf86vm -lpthread -lm
+
+test: test.c
+	cc -o test.bin test.c -O3 -Wall -Werror -Wextra -Wpedantic -l5kgl -lglfw -lGL -lGLEW -lX11 -lXrandr -lXi -lXxf86vm -lpthread -lm
