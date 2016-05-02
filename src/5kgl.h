@@ -206,6 +206,7 @@ enum MeshAttribute {
     VERT = 0,
     TRIS,
     NORM,
+    UV,
     COLOR,
     NUMBER_ATTRIBUTES
 };
@@ -261,6 +262,8 @@ typedef GLuint (*_attrib_buffer_maker)(Mesh*);
 
 void pack_vec3(list*, float[]);
 
+void pack_vec2(list*, float[]);
+
 void pack_ivec3(list*, short[]);
 
 void pack_color(list*, float[]);
@@ -272,6 +275,8 @@ GLuint make_norm_buffer(Mesh*);
 GLuint make_tri_buffer(Mesh*);
 
 GLuint make_color_buffer(Mesh*);
+
+GLuint make_uv_buffer(Mesh*);
 
 Mesh* make_mesh();
 
@@ -286,6 +291,8 @@ int mesh_add_point(Mesh*, vec3*);
 int mesh_add_tri(Mesh*, ivec3*);
 
 int mesh_add_normal(Mesh*, vec3*);
+
+int mesh_add_uv(Mesh*, vec2*);
 
 int mesh_add_color(Mesh*, color*);
 

@@ -14,7 +14,7 @@ void _pass_gl_matrix_4fv(GLuint handle, int count, void *matrix) {
 
 const GLuint _NO_MAPPING = 0xdeadbeef;
 
-int _attrib_size[] = {3, 3, 3, 4};
+int _attrib_size[] = {3, 3, 3, 2, 4};
 
 GLuint make_buffer(
     GLenum target,
@@ -123,6 +123,13 @@ void pack_vec3(list *l, float d[]) {
     }
 }
 
+void pack_vec2(list *l, float d[]) {
+    for (int i = 0; i < l->length; i++) {
+        d[i * 2 + 0] = (float) ((vec2*) l->data[i])->x;
+        d[i * 2 + 1] = (float) ((vec2*) l->data[i])->y;
+    }
+}
+
 void pack_ivec3(list *l, short d[]) {
     for (int i = 0; i < l->length; i++) {
         d[i * 3 + 0] = (short) ((ivec3*) l->data[i])->i;
@@ -158,6 +165,13 @@ GLuint make_norm_buffer(Mesh *m) {
     return make_buffer(GL_ARRAY_BUFFER, data, size);
 }
 
+GLuint make_uv_buffer(Mesh *m) {
+    int size = m->attr[UV]->length * 2 * sizeof(float);
+    float *data = alloca(size);
+    pack_vec2(m->attr[UV], data);
+    return make_buffer(GL_ARRAY_BUFFER, data, size);
+}
+
 GLuint make_tri_buffer(Mesh *m) {
     int size = m->attr[TRIS]->length * 3 * sizeof(short);
     short *data = alloca(size);
@@ -185,6 +199,7 @@ _attrib_buffer_maker _buffer_maker[] = {
     make_vert_buffer,
     make_tri_buffer,
     make_norm_buffer,
+    make_uv_buffer,
     make_color_buffer
 };
 
@@ -223,6 +238,10 @@ void mesh_add_mesh(Mesh *m, Mesh *toAdd) {
 
 int mesh_add_point(Mesh *m, vec3 *p) {
     return list_add(m->attr[VERT], p);
+}
+
+int mesh_add_uv(Mesh *m, vec2 *p) {
+    return list_add(m->attr[UV], p);
 }
 
 int mesh_add_tri(Mesh *m, ivec3 *tri) {

@@ -137,18 +137,27 @@ Mesh* read_obj(const char *filename) {
 
     list *lines = read_lines(filename);
     for (int i = 0; i < lines->length; i++) {
-        list *parts = split_string(list_get(lines, i), " ");
+        char *line = (char*) list_get(lines, i);
+        list *parts = split_string(line, " ");
 
         char *tag = (char*) list_get(parts, 0);
 
         if (strcmp("v", tag) == 0) {
-
+            // 5kgl does not support homogeneous coordinates in Mesh structs,
+            // so this block ignores the 4th parameter if given
+            vec3* v = c_vec3(0.0, 0.0, 0.0);
+            sscanf(line, "v %lf %lf %lf", &v->x, &v->y, &v->z);
+            mesh_add_point(mesh, v);
         } else if (strcmp("vt", tag) == 0) {
-
+            vec2* v = c_vec2(0.0, 0.0);
+            sscanf(line, "vt %lf %lf", &v->x, &v->y);
+            mesh_add_uv(mesh, v);
         } else if (strcmp("vn", tag) == 0) {
-
+            vec3* v = c_vec3(0.0, 0.0, 0.0);
+            sscanf(line, "vn %lf %lf %lf", &v->x, &v->y, &v->z);
+            mesh_add_normal(mesh, v);
         } else if (strcmp("f", tag) == 0) {
-
+            // TODO lots of fun edge cases here
         }
 
         list_free(parts);
