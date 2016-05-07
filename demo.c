@@ -29,7 +29,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 int main() {
     // create a fullscreen window
-    glfwSetKeyCallback(make_window(-1, -1, "5kgl"), key_callback);
+    make_window(-1, -1, "5kgl");
+    add_key_callback(key_callback);
 
     // create shader and map variables
     shader = make_shader("assets/color_vertex.glsl", "assets/color_fragment.glsl");

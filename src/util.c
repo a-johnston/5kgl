@@ -82,6 +82,18 @@ void* list_remove(list *l, int i) {
     return temp;
 }
 
+int list_remove_element(list *l, void *value) {
+    int i = list_find(l, value);
+
+    if (i == -1) {
+        return 0;
+    }
+
+    list_remove(l, i);
+
+    return 1;
+}
+
 void list_clear(list *l) {
     for (int i = 0; i < l->length; i++) {
         free(l->data[i]);
@@ -163,6 +175,17 @@ Mesh* read_obj(const char *filename) {
         list_free(parts);
     }
     list_free(lines);
+
+    return mesh;
+}
+
+Mesh * read_raw_mesh(const char *filename) {
+    Mesh *mesh = make_mesh();
+
+    list *lines = read_lines(filename);
+    for (int i = 0; i < lines->length; i++) {
+
+    }
 
     return mesh;
 }
