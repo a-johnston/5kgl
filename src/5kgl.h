@@ -328,6 +328,8 @@ void add_key_callback(void (*) (GLFWwindow*, int, int, int, int));
 
 void remove_key_callback(void (*) (GLFWwindow*, int, int, int, int));
 
+void get_cursor_position(double*, double*);
+
 GLFWwindow* make_window(int, int, char*);
 
 void start_main_loop(void (*) (double), void (*) ());

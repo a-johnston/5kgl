@@ -73,7 +73,7 @@ GLuint _make_program(GLuint vertex_shader, GLuint fragment_shader) {
     return program;
 }
 
-static float ar = 0.0f;
+float ar;
 
 void resize_callback(GLFWwindow *window, int width, int height) {
     (void) window;
@@ -85,6 +85,9 @@ float get_aspect_ratio() {
 }
 
 GLFWwindow *window;
+GLFWmonitor *monitor;
+
+int w, h;
 list *key_cb_list;
 
 void __key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
@@ -105,7 +108,7 @@ GLFWwindow* make_window(int width, int height, char *title) {
         exit(EXIT_FAILURE);
     }
 
-    GLFWmonitor *monitor = NULL;
+    monitor = NULL;
 
     if (width < 1 && height < 1) {
         monitor = glfwGetPrimaryMonitor();
@@ -128,10 +131,13 @@ GLFWwindow* make_window(int width, int height, char *title) {
     glfwWindowHint(GLFW_SAMPLES, 1);
 
     window = glfwCreateWindow(width, height, title, monitor, NULL);
+
     ar = (float) width / (float) height;
+    w  = width;
+    h  = height;
 
     if (monitor) {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
 
     if (!window) {
@@ -171,6 +177,10 @@ void add_key_callback(void (*f)(GLFWwindow*, int, int, int, int)) {
 
 void remove_key_callback(void (*f)(GLFWwindow*, int, int, int, int)) {
     list_remove_element(key_cb_list, f);
+}
+
+void get_cursor_position(double *x, double *y) {
+    glfwGetCursorPos(window, x, y);
 }
 
 void start_main_loop(
