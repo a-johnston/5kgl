@@ -168,6 +168,8 @@ GLFWwindow* make_window(int width, int height, char *title) {
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+    set_actors(create_list());
+
     return window;
 }
 
@@ -183,16 +185,14 @@ void get_cursor_position(double *x, double *y) {
     glfwGetCursorPos(window, x, y);
 }
 
-void start_main_loop(
-    void (*step_callback) (double),
-    void (*draw_callback) ()
-) {
+void start_main_loop() {
     glfwSetTime(0.0);
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
-        if (step_callback) step_callback(glfwGetTime());
+        step_scene(glfwGetTime());
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        if (draw_callback) draw_callback();
+        draw_scene();
         glfwSwapBuffers(window);
     }
 

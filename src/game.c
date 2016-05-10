@@ -12,6 +12,11 @@ Actor* make_actor(void (*create) (), void (*step) (double), void (*draw) ()) {
     return actor;
 }
 
+void add_actor(Actor* actor) {
+    list_add(actors, actor);
+    (actor->create)();
+}
+
 list* set_actors(list *new_actors) {
     list* temp = actors;
     actors = new_actors;

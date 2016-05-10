@@ -312,21 +312,23 @@ void mesh_make_normals(Mesh*);
  * game
  */
 
- typedef struct {
+typedef struct {
     void (*create) ();
     void (*step) (double);
     void (*draw) ();
- } Actor;
+} Actor;
 
- Actor* make_actor(void (*) (), void (*) (double), void (*) ());
+Actor* make_actor(void (*) (), void (*) (double), void (*) ());
 
- list* set_actors(list*);
+void add_actor(Actor*);
 
- list* get_actors();
+list* set_actors(list*);
 
- void step_scene(double);
+list* get_actors();
 
- void draw_scene();
+void step_scene(double);
+
+void draw_scene();
 
 /*
  * render.c
@@ -352,7 +354,7 @@ void get_cursor_position(double*, double*);
 
 GLFWwindow* make_window(int, int, char*);
 
-void start_main_loop(void (*) (double), void (*) ());
+void start_main_loop();
 
 // extra util stuff
 
