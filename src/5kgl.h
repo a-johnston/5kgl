@@ -309,6 +309,26 @@ Mesh* mesh_build_plane();
 void mesh_make_normals(Mesh*);
 
 /*
+ * game
+ */
+
+ typedef struct {
+    void (*create) ();
+    void (*step) (double);
+    void (*draw) ();
+ } Actor;
+
+ Actor* make_actor(void (*) (), void (*) (double), void (*) ());
+
+ list* set_actors(list*);
+
+ list* get_actors();
+
+ void step_scene(double);
+
+ void draw_scene();
+
+/*
  * render.c
  */
 
