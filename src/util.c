@@ -105,12 +105,11 @@ void list_clear(list *l) {
 }
 
 void list_free(list *l) {
-    list_clear(l);
-
-    if (l->data != NULL) {
-        free(l->data);
+    for (int i = 0; i < l->length; i++) {
+        free(l->data[i]);
     }
 
+    free(l->data);
     free(l);
 }
 

@@ -18,10 +18,13 @@ vec2* c_vec2(double x, double y) {
 
 vec3* c_vec3(double x, double y, double z) {
     vec3* v = (vec3*) malloc(sizeof(vec3));
-    //*v = (vec3) { x, y, z };
-    v->x = x;
-    v->y = y;
-    v->z = z;
+    *v = (vec3) { x, y, z };
+    return v;
+}
+
+ivec3* c_ivec3(int i, int j, int k) {
+    ivec3* v = (ivec3*) malloc(sizeof(ivec3));
+    *v = (ivec3) { i, j, k };
     return v;
 }
 

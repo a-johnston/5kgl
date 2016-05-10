@@ -18,7 +18,7 @@ void create_call() {
     map_shader_uniform(shader, MATRIX_4FV, "model", 1, &m);
 
     // load mesh and send data to gpu
-    mesh = read_raw("assets/suzanne.raw");
+    mesh = mesh_build_cube();
     mesh_make_vbo(mesh);
 
     // cube rotation matrix

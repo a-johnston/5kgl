@@ -86,6 +86,8 @@ vec2* c_vec2(double, double);
 
 vec3* c_vec3(double, double, double);
 
+ivec3* c_ivec3(int, int, int);
+
 quat* c_quat(double, double, double, double);
 
 mat4* c_mat4();
@@ -282,6 +284,8 @@ GLuint make_uv_buffer(Mesh*);
 
 Mesh* make_mesh();
 
+void free_mesh(Mesh*);
+
 void mesh_make_vbo(Mesh*);
 
 void mesh_translate(Mesh*, vec3);
@@ -307,6 +311,8 @@ Mesh* mesh_build_cube();
 Mesh* mesh_build_plane();
 
 void mesh_make_normals(Mesh*);
+
+Mesh* simplify_mesh(Mesh*);
 
 /*
  * game

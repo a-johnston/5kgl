@@ -20,7 +20,7 @@ make demo
 ./demo.bin
 ```
 
-Bam! You should see suzanne.
+Bam! You should see a cube.
 
 Currently implemented:
 - Shaders

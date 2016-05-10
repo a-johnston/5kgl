@@ -28,6 +28,10 @@ GLuint make_buffer(
     return buffer;
 }
 
+void free_buffer(GLuint buffer) {
+    glDeleteBuffers(1, &buffer);
+}
+
 Shader* make_shader(char *vertex, char *fragment) {
     GLuint v = _make_shader(GL_VERTEX_SHADER, vertex);
     GLuint f = _make_shader(GL_FRAGMENT_SHADER, fragment);
@@ -195,6 +199,17 @@ Mesh* make_mesh() {
     return m;
 }
 
+void free_mesh(Mesh *mesh) {
+    for (int i = 0; i < NUMBER_ATTRIBUTES; i++) {
+        list_free(mesh->attr[i]);
+
+        if (mesh->vbo[i] != _NO_MAPPING) {
+            free_buffer(mesh->vbo[i]);
+        }
+    }
+    free(mesh);
+}
+
 _attrib_buffer_maker _buffer_maker[] = {
     make_vert_buffer,
     make_tri_buffer,
@@ -334,10 +349,41 @@ void mesh_make_normals(Mesh *m) {
         add_vec3_mutable((vec3*) list_get(m->attr[NORM], tri.k), &norm);
     }
 
-    //ensure norm = 1
+    //ensure normalized
     for (int i = 0; i < m->attr[NORM]->length; i++) {
         normalize_mutable((vec3*) list_get(m->attr[NORM], i));
     }
+}
+
+int _point_in_mesh(vec3 *point, Mesh *mesh) {
+    vec3 *temp;
+    for (int i = 0; i < mesh->attr[VERT]->length; i++) {
+        temp = (vec3*) list_get(mesh->attr[VERT], i);
+
+        if (point->x == temp->x && point->y == temp->y && point->z == temp->z) {
+            return i;
+        }
+    }
+
+    vec3 *new = c_vec3(point->x, point->y, point->z);
+    return mesh_add_point(mesh, new);
+}
+
+Mesh* simplify_mesh(Mesh *old) {
+    Mesh *new = make_mesh();
+
+    ivec3 *tri;
+    for (int i = 0; i < old->attr[TRIS]->length; i++) {
+        tri = (ivec3*) list_get(old->attr[TRIS], i);
+        mesh_add_tri(new, c_ivec3(
+            _point_in_mesh((vec3*) list_get(old->attr[VERT], tri->i), new),
+            _point_in_mesh((vec3*) list_get(old->attr[VERT], tri->j), new),
+            _point_in_mesh((vec3*) list_get(old->attr[VERT], tri->k), new)));
+    }
+
+    //free_mesh(old);
+    mesh_make_normals(new);
+    return new;
 }
 
 #endif
