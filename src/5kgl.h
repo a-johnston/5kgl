@@ -24,7 +24,7 @@
  * util.c
  */
 
-#define DEFAULT_LIST_CAPACITY 20
+#define DEFAULT_LIST_CAPACITY 16
 
 typedef struct {
     void **data;
@@ -361,5 +361,7 @@ void start_main_loop();
 list* read_lines(const char *filename);
 
 Mesh* read_obj(const char *filename);
+
+Mesh* read_raw(const char *filename);
 
 #endif

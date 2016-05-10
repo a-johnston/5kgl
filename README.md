@@ -20,7 +20,7 @@ make demo
 ./demo.bin
 ```
 
-Bam! You should have a demo.
+Bam! You should see suzanne.
 
 Currently implemented:
 - Shaders
@@ -40,11 +40,8 @@ Currently implemented:
     - Super portable
 
 Hopefully coming in the future:
-- Sweet textures
-    - Mostly hoping for loading utilities
-- Scenes
-    - Sort of up in the air since draw function is left to user
-    - Pretty open ended at the moment
+- Sweet loading utilities
+    - Textures, meshes, etc
 - Simple physics
     - Not looking to remake bullet or anything actually useful
     - Just simple hull collisions and raycasting likely

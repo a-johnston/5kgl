@@ -36,7 +36,7 @@ void _ensure_capacity(list *l, int length, int buffer) {
 }
 
 int list_add(list *l, void *value) {
-    _ensure_capacity(l, l->length, DEFAULT_LIST_CAPACITY);
+    _ensure_capacity(l, l->length + 1, DEFAULT_LIST_CAPACITY);
     l->data[l->length] = value;
     l->length += 1;
     return l->length - 1;
@@ -179,12 +179,22 @@ Mesh* read_obj(const char *filename) {
     return mesh;
 }
 
-Mesh * read_raw_mesh(const char *filename) {
+Mesh * read_raw(const char *filename) {
     Mesh *mesh = make_mesh();
+
+    double x1, y1, z1,
+           x2, y2, z2,
+           x3, y3, z3;
 
     list *lines = read_lines(filename);
     for (int i = 0; i < lines->length; i++) {
+        sscanf((char*) list_get(lines, i), "%lf %lf %lf %lf %lf %lf %lf %lf %lf",
+            &x1, &y1, &z1, &x2, &y2, &z2, &x3, &y3, &z3);
 
+        mesh_build_triangle(mesh,
+            c_vec3(x1, y1, z1),
+            c_vec3(x2, y2, z2),
+            c_vec3(x3, y3, z3));
     }
 
     return mesh;

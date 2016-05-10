@@ -1,7 +1,7 @@
 #include <math.h>
 #include <5kgl.h>
 
-static Mesh *cube;
+static Mesh *mesh;
 static mat4 m, mvp;
 static Camera camera;
 static quat rot, q;
@@ -17,9 +17,9 @@ void create_call() {
     map_shader_uniform(shader, MATRIX_4FV, "mvp", 1, &mvp);
     map_shader_uniform(shader, MATRIX_4FV, "model", 1, &m);
 
-    // make cube mesh and send data to gpu
-    cube = mesh_build_cube();
-    mesh_make_vbo(cube);
+    // load mesh and send data to gpu
+    mesh = read_raw("assets/suzanne.raw");
+    mesh_make_vbo(mesh);
 
     // cube rotation matrix
     q = (quat) { 0.0, 0.0, 0.0, 1.0 };
@@ -35,7 +35,7 @@ void step_call(double time) {
 
 void draw_call() {
     cam_get_mvp(mvp, &camera, m);
-    draw_mesh(shader, cube);
+    draw_mesh(shader, mesh);
     check_gl_error();
 }
 
@@ -60,8 +60,8 @@ int main() {
     cam_update_perspective(&camera, 70.0f, 1.0f, 100.0f);
 
     //set the scene
-    Actor *cube = make_actor(create_call, step_call, draw_call);
-    add_actor(cube);
+    Actor *monkey = make_actor(create_call, step_call, draw_call);
+    add_actor(monkey);
 
     start_main_loop();
 
