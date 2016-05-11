@@ -13,7 +13,6 @@ void _pass_gl_matrix_4fv(GLuint handle, int count, void *matrix) {
 }
 
 void _pass_gl_texture_2d(GLuint handle, int texUnit, void *texId) {
-    (void) handle;
     glActiveTexture(GL_TEXTURE0 + texUnit);
     glBindTexture(GL_TEXTURE_2D, *(GLuint*)texId);
     glUniform1i(handle, texUnit);
