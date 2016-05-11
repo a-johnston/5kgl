@@ -10,6 +10,6 @@ varying vec3 norm;
 void main()
 {
     norm = vec3(model * vec4(normal, 1.0));
-	color = position * 0.4 + vec3(0.5, 0.5, 0.5);
+    color = position * 0.4 + vec3(0.5, 0.5, 0.5);
     gl_Position = mvp * vec4(position, 1.0);
 }

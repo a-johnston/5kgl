@@ -217,7 +217,8 @@ enum MeshAttribute {
 
 enum ShaderUniformType {
     MATRIX_4FV,
-    VECTOR_3FV
+    VECTOR_3FV,
+    TEXTURE_2D
 };
 
 // shader uniform setter impl

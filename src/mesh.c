@@ -12,6 +12,13 @@ void _pass_gl_matrix_4fv(GLuint handle, int count, void *matrix) {
     glUniformMatrix4fv(handle, count, GL_FALSE, *((mat4*) matrix));
 }
 
+void _pass_gl_texture_2d(GLuint handle, int texUnit, void *texId) {
+    (void) handle;
+    glActiveTexture(GL_TEXTURE0 + texUnit);
+    glBindTexture(GL_TEXTURE_2D, *(GLuint*)texId);
+    glUniform1i(handle, texUnit);
+}
+
 const GLuint _NO_MAPPING = 0xdeadbeef;
 
 int _attrib_size[] = {3, 3, 3, 2, 4};
@@ -74,10 +81,14 @@ uniform_data* map_shader_uniform(Shader *shader, int type, char *handle, int cou
         case MATRIX_4FV:
             data->func = _pass_gl_matrix_4fv;
             list_add(shader->unif, data);
-            break;
+            return data;
+        case TEXTURE_2D:
+            data->func = _pass_gl_texture_2d;
+            list_add(shader->unif, data);
+            return data;
     }
 
-    return data;
+    return NULL;
 }
 
 void _bind_program_mesh(Shader *shader, Mesh *mesh) {

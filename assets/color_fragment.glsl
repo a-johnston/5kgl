@@ -1,3 +1,5 @@
+uniform sampler2D sample;
+
 varying vec3 color;
 varying vec3 norm;
 
