@@ -59,6 +59,14 @@ Shader* make_shader(char *vertex, char *fragment) {
     return shader;
 }
 
+void free_shader(Shader* shader) {
+    glDeleteShader(shader->vert);
+    glDeleteShader(shader->frag);
+    glDeleteProgram(shader->prog);
+    list_free(shader->unif);
+    free(shader);
+}
+
 void map_shader_attrib(Shader *shader, int attrib, char *handle) {
     if (attrib == TRIS) {
         return;

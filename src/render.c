@@ -195,6 +195,7 @@ void start_main_loop() {
         draw_scene();
         glfwSwapBuffers(window);
     }
+    end_game();
 
     glfwDestroyWindow(window);
     glfwTerminate();

@@ -253,6 +253,8 @@ GLuint make_buffer(GLenum, const void*, GLsizei);
 
 Shader* make_shader(char*, char*);
 
+void free_shader(Shader*);
+
 void map_shader_attrib(Shader*, int, char*);
 
 uniform_data* map_shader_uniform(Shader*, int, char*, int, void*);
@@ -323,9 +325,10 @@ typedef struct {
     void (*create) ();
     void (*step) (double);
     void (*draw) ();
+    void (*destroy) ();
 } Actor;
 
-Actor* make_actor(void (*) (), void (*) (double), void (*) ());
+Actor* make_actor(void (*) (), void (*) (double), void (*) (), void (*) ());
 
 void add_actor(Actor*);
 
@@ -333,9 +336,15 @@ list* set_actors(list*);
 
 list* get_actors();
 
+void start_game();
+
 void step_scene(double);
 
 void draw_scene();
+
+void end_scene();
+
+void end_game();
 
 /*
  * render.c

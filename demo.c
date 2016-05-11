@@ -39,6 +39,11 @@ void draw_call() {
     check_gl_error();
 }
 
+void destroy_call() {
+    free_mesh(mesh);
+    free_shader(shader);
+}
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     (void) scancode;
     (void) mods;
@@ -60,8 +65,8 @@ int main() {
     cam_update_perspective(&camera, 70.0f, 1.0f, 100.0f);
 
     //set the scene
-    Actor *monkey = make_actor(create_call, step_call, draw_call);
-    add_actor(monkey);
+    Actor *actor = make_actor(create_call, step_call, draw_call, destroy_call);
+    add_actor(actor);
 
     start_main_loop();
 
