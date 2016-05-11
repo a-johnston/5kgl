@@ -6,19 +6,16 @@ static mat4 m, mvp;
 static Camera camera;
 static quat rot, q;
 static Shader *shader;
-static GLuint texture;
 
 void create_call() {
     // create shader and map variables
     shader = make_shader("assets/color_vertex.glsl", "assets/color_fragment.glsl");
-    texture = load_bmp("/home/adam/test.bmp");
 
     map_shader_attrib(shader, VERT, "position");
     map_shader_attrib(shader, NORM, "normal");
 
     map_shader_uniform(shader, MATRIX_4FV, "mvp", 1, &mvp);
     map_shader_uniform(shader, MATRIX_4FV, "model", 1, &m);
-    map_shader_uniform(shader, TEXTURE_2D, "sample", 0, &texture);
 
     // load mesh and send data to gpu
     mesh = mesh_build_cube();
