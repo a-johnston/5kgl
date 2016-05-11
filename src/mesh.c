@@ -202,6 +202,7 @@ Mesh* make_mesh() {
 void free_mesh(Mesh *mesh) {
     for (int i = 0; i < NUMBER_ATTRIBUTES; i++) {
         list_free(mesh->attr[i]);
+        mesh->attr[i] = NULL;
 
         if (mesh->vbo[i] != _NO_MAPPING) {
             free_buffer(mesh->vbo[i]);
@@ -381,7 +382,7 @@ Mesh* simplify_mesh(Mesh *old) {
             _point_in_mesh((vec3*) list_get(old->attr[VERT], tri->k), new)));
     }
 
-    //free_mesh(old);
+    free_mesh(old);
     mesh_make_normals(new);
     return new;
 }

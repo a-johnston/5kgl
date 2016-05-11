@@ -94,9 +94,19 @@ int list_remove_element(list *l, void *value) {
     return 1;
 }
 
+void _safe_free_element(list *l, void *p) {
+    for (int i = 0; i < l->length; i++) {
+        if (l->data[i] == p) {
+            l->data[i] = NULL;
+        }
+    }
+
+    free(p);
+}
+
 void list_clear(list *l) {
     for (int i = 0; i < l->length; i++) {
-        free(l->data[i]);
+        _safe_free_element(l, l->data[i]);
     }
 
     l->length   = 0;
@@ -105,11 +115,16 @@ void list_clear(list *l) {
 }
 
 void list_free(list *l) {
+    if (!l) {
+        return;
+    }
+
     for (int i = 0; i < l->length; i++) {
-        free(l->data[i]);
+        _safe_free_element(l, l->data[i]);
     }
 
     free(l->data);
+    l->data = NULL;
     free(l);
 }
 
@@ -178,7 +193,7 @@ Mesh* read_obj(const char *filename) {
     return mesh;
 }
 
-Mesh * read_raw(const char *filename) {
+Mesh* read_raw(const char *filename) {
     Mesh *mesh = make_mesh();
 
     double x1, y1, z1,
