@@ -214,4 +214,57 @@ Mesh* read_raw(const char *filename) {
     return mesh;
 }
 
+// src: https://github.com/opengl-tutorials/ogl/blob/master/common/texture.cpp
+GLuint load_bmp(const char *filename) {
+    FILE *f = fopen(filename, "rb");
+    
+    if (!f) {
+        fprintf(stderr, "Unable to open %s for reading\n", filename);
+        return 0;
+    }
+
+    unsigned char  header[54];
+    unsigned int   dataPos, width, height, size;
+    unsigned char *data;
+
+    if (fread(header, 1, 54, f) != 54
+     || *(int*)&header[0x1E] != 0
+     || *(int*)&header[0x1C] != 24) {
+        fprintf(stderr, "Bad BMP file %s\n", filename);
+        return 0;
+    }
+
+    dataPos = *(int*)&(header[0x0A]);
+    size    = *(int*)&(header[0x22]);
+    width   = *(int*)&(header[0x12]);
+    height  = *(int*)&(header[0x16]);
+
+    if (size == 0) {
+        size = width * height * 3;
+    }
+
+    if (dataPos == 0) {
+        dataPos = 54;
+    }
+
+    data = (unsigned char*) malloc(sizeof(char) * size);
+    fread(data, 1, size, f);
+    fclose(f);
+
+    GLuint texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
+
+    free(data);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); 
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    return texture;
+}
+
 #endif

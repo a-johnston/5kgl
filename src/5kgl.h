@@ -364,10 +364,12 @@ void start_main_loop();
 
 // extra util stuff
 
-list* read_lines(const char *filename);
+list* read_lines(const char*);
 
-Mesh* read_obj(const char *filename);
+Mesh* read_obj(const char*);
 
-Mesh* read_raw(const char *filename);
+Mesh* read_raw(const char*);
+
+GLuint load_bmp(const char*);
 
 #endif

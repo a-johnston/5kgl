@@ -2,8 +2,8 @@ build: src/5kgl.h src/*.c
 	mkdir -p include bin lib
 	cp src/5kgl.h include/5kgl.h
 	cd bin/; \
-	gcc -fpic -Os -Wall -Werror -Wextra -c ../src/*.c ../src/5kgl.h ;\
-	gcc -shared -fpic -Wall -Werror -Wextra -o ../lib/lib5kgl.so *.o -lc
+	gcc -fpic -fno-strict-aliasing -O3 -Wall -Werror -Wextra -c ../src/*.c ../src/5kgl.h ;\
+	gcc -shared -fpic -fno-strict-aliasing -O3 -Wall -Werror -Wextra -o ../lib/lib5kgl.so *.o -lc
 
 install: lib/lib5kgl.so include/5kgl.h
 	sudo cp lib/lib5kgl.so /usr/lib/
