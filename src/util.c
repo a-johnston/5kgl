@@ -72,6 +72,15 @@ int list_find(list *l, void *value) {
     return -1;
 }
 
+void* list_iterate(list *l, int *i, void **value) {
+    if (*i < l->length) {
+        *value = l->data[*i];
+        (*i)++;
+        return *value;
+    }
+    return NULL;
+}
+
 void* list_remove(list *l, int i) {
     void *temp = l->data[i];
     for (; i < l->length - 1; i++) {
@@ -128,6 +137,13 @@ void list_free(list *l) {
     free(l);
 }
 
+void list_free_keep_elements(list *l) {
+    if (l) {
+        free(l->data);
+        free(l);
+    }
+}
+
 void* read_file(const char *filename, int *length) {
     FILE *f = fopen(filename, "r");
     void *buffer;
@@ -161,6 +177,10 @@ list* read_lines(const char *filename) {
 Mesh* read_obj(const char *filename) {
     Mesh *mesh = make_mesh();
 
+    list *verts = create_list();
+    list *norms = create_list();
+    list *uvs   = create_list();
+
     list *lines = read_lines(filename);
     for (int i = 0; i < lines->length; i++) {
         char *line = (char*) list_get(lines, i);
@@ -173,16 +193,17 @@ Mesh* read_obj(const char *filename) {
             // so this block ignores the 4th parameter if given
             vec3* v = c_vec3(0.0, 0.0, 0.0);
             sscanf(line, "v %lf %lf %lf", &v->x, &v->y, &v->z);
-            mesh_add_point(mesh, v);
+            list_add(verts, v);
         } else if (strcmp("vt", tag) == 0) {
             vec2* v = c_vec2(0.0, 0.0);
             sscanf(line, "vt %lf %lf", &v->x, &v->y);
-            mesh_add_uv(mesh, v);
+            list_add(uvs, v);
         } else if (strcmp("vn", tag) == 0) {
             vec3* v = c_vec3(0.0, 0.0, 0.0);
             sscanf(line, "vn %lf %lf %lf", &v->x, &v->y, &v->z);
-            mesh_add_normal(mesh, v);
+            list_add(norms, v);
         } else if (strcmp("f", tag) == 0) {
+            
             // TODO lots of fun edge cases here
         }
 

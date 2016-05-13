@@ -46,13 +46,17 @@ void* list_get(list*, int);
 
 int list_find(list*, void*);
 
+void* list_iterate(list*, int*, void**);
+
 void* list_remove(list*, int);
 
 int list_remove_element(list*, void*);
 
 void list_clear(list*);
 
-void list_free(list *l);
+void list_free(list*);
+
+void list_free_keep_elements(list*);
 
 void* read_file(const char*, int*);
 
@@ -147,6 +151,8 @@ double norm2_quat(quat);
 vec3 cross(vec3, vec3);
 
 vec3 normal_vector(vec3*, vec3*, vec3*);
+
+double vec3_distance(vec3, vec3);
 
 // quaternion math and helper functions
 
@@ -381,5 +387,37 @@ Mesh* read_obj(const char*);
 Mesh* read_raw(const char*);
 
 GLuint load_bmp(const char*);
+
+/*
+ * physics.c
+ */
+
+enum HitboxType {
+    RECT = 0,
+    SPHERE,
+    PLANE,
+    HITBOX_NUM
+};
+
+typedef struct {
+    int type;
+    void *hitbox;
+} Hitbox;
+
+struct rect_hitbox {
+    vec3 pos;
+    vec3 dim;
+};
+
+struct sphere_hitbox {
+    vec3 pos;
+    double r;
+};
+
+vec3 collide(struct sphere_hitbox, Hitbox);
+
+vec3 collide_sphere_rect(struct sphere_hitbox, struct rect_hitbox);
+
+vec3 collide_sphere_sphere(struct sphere_hitbox, struct sphere_hitbox);
 
 #endif

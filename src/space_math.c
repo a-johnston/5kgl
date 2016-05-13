@@ -178,6 +178,10 @@ vec3 normal_vector(vec3 *a, vec3 *b, vec3 *c) {
     return normalize(cross(sub(*b, *a), sub(*c, *a)));
 }
 
+double vec3_distance(vec3 a, vec3 b) {
+    return norm_vec3(sub(a, b));
+}
+
 /*
  * Quaternion math and helpers
  */
