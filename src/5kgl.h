@@ -60,6 +60,22 @@ void list_free_keep_elements(list*);
 
 void* read_file(const char*, int*);
 
+typedef struct {
+    int *data;
+    int size;
+    int i;
+} ring_buffer;
+
+ring_buffer* make_ring_buffer(int);
+
+void ring_buffer_free(ring_buffer*);
+
+void ring_buffer_add(ring_buffer*, int);
+
+int ring_buffer_get(ring_buffer*, int);
+
+int int_mod(int i, int m);
+
 /*
  * space_math.c
  */

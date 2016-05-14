@@ -60,7 +60,7 @@ void* list_insert(list *l, void *value, int i) {
 }
 
 void* list_get(list *l, int i) {
-    return l->data[i];
+    return l->data[int_mod(i, l->length)];
 }
 
 int list_find(list *l, void *value) {
@@ -144,6 +144,38 @@ void list_free_keep_elements(list *l) {
     }
 }
 
+ring_buffer* make_ring_buffer(int size) {
+    ring_buffer *buffer = (ring_buffer*) malloc(sizeof(ring_buffer));
+    *buffer = (ring_buffer) {
+        (int*) malloc(size * sizeof(int)),
+        size,
+        0
+    };
+    return buffer;
+}
+
+void ring_buffer_free(ring_buffer *buffer) {
+    free(buffer->data);
+    free(buffer);
+}
+
+void ring_buffer_add(ring_buffer *ring, int i) {
+    ring->data[int_mod(ring->i, ring->size)] = i;
+    ring->i++;
+}
+
+int ring_buffer_get(ring_buffer *ring, int i) {
+    return ring->data[int_mod(i, ring->size)];
+}
+
+int int_mod(int i, int m) {
+    if (i >= 0) {
+        return i % m;
+    } else {
+        return m + (i % m);
+    }
+}
+
 void* read_file(const char *filename, int *length) {
     FILE *f = fopen(filename, "r");
     void *buffer;
@@ -184,6 +216,7 @@ Mesh* read_obj(const char *filename) {
     list *lines = read_lines(filename);
     for (int i = 0; i < lines->length; i++) {
         char *line = (char*) list_get(lines, i);
+
         list *parts = split_string(line, " ");
 
         char *tag = (char*) list_get(parts, 0);
@@ -203,13 +236,48 @@ Mesh* read_obj(const char *filename) {
             sscanf(line, "vn %lf %lf %lf", &v->x, &v->y, &v->z);
             list_add(norms, v);
         } else if (strcmp("f", tag) == 0) {
-            
-            // TODO lots of fun edge cases here
+            ring_buffer *buffer = make_ring_buffer(2);
+
+            int c = -1;
+            int i = 1;
+            void *str;
+
+            while (list_iterate(parts, &i, &str)) {
+                list *vert = split_string((char*) str, "/");
+
+                // add point and add index to buffer
+                ring_buffer_add(buffer, mesh_add_point(mesh, list_get(verts, atoi(list_get(vert, 0)) - 1)));
+
+                // add UV information if it exists
+                if (vert->length > 1 && strlen((char*) list_get(vert, 1)) > 0) {
+                    mesh_add_uv(mesh, list_get(uvs, atoi(list_get(vert, 1)) - 1));
+                }
+
+                // add normal information if it exists
+                if (vert->length > 2 && strlen((char*) list_get(vert, 2)) > 0) {
+                    mesh_add_normal(mesh, list_get(norms, atoi(list_get(vert, 2)) - 1));
+                }
+
+                if (buffer->i == 1) { // holds the first point as a reference for the convex hull
+                    c = ring_buffer_get(buffer, 0);
+                } else if (buffer->i > 2) { // builds the triangle assuming the ngon is a convex hull
+                    mesh_add_tri(mesh, c_ivec3(
+                        c,
+                        ring_buffer_get(buffer, 0),
+                        ring_buffer_get(buffer, 1)));
+                }
+                //list_free(vert);
+            }
+            ring_buffer_free(buffer);
         }
 
-        list_free(parts);
+        //list_free(parts);
     }
-    list_free(lines);
+    //list_free(lines);
+
+    list_free_keep_elements(verts);
+    list_free_keep_elements(norms);
+    list_free_keep_elements(uvs);
 
     return mesh;
 }
