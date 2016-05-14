@@ -165,7 +165,7 @@ void ring_buffer_add(ring_buffer *ring, int i) {
 }
 
 int ring_buffer_get(ring_buffer *ring, int i) {
-    return ring->data[int_mod(i, ring->size)];
+    return ring->data[int_mod((ring->i - 1) + i, ring->size)];
 }
 
 int int_mod(int i, int m) {
@@ -263,8 +263,8 @@ Mesh* read_obj(const char *filename) {
                 } else if (buffer->i > 2) { // builds the triangle assuming the ngon is a convex hull
                     mesh_add_tri(mesh, c_ivec3(
                         c,
-                        ring_buffer_get(buffer, 0),
-                        ring_buffer_get(buffer, 1)));
+                        ring_buffer_get(buffer, 1),
+                        ring_buffer_get(buffer, 0)));
                 }
                 //list_free(vert);
             }
