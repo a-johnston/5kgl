@@ -7,15 +7,22 @@ static Camera camera;
 static quat rot, q;
 static Shader *shader;
 
+list *uniforms;
+
 void create_call() {
     // create shader and map variables
     shader = make_shader("assets/color_vertex.glsl", "assets/color_fragment.glsl");
 
+    uniforms = create_list();
+
     map_shader_attrib(shader, VERT, "position");
     map_shader_attrib(shader, NORM, "normal");
 
-    map_shader_uniform(shader, MATRIX_4FV, "mvp", 1, &mvp);
-    map_shader_uniform(shader, MATRIX_4FV, "model", 1, &m);
+    map_shader_uniform(shader, MATRIX_4FV, "mvp", 1);
+    map_shader_uniform(shader, MATRIX_4FV, "model", 1);
+
+    list_add(uniforms, &mvp);
+    list_add(uniforms, &m);
 
     // load mesh and send data to gpu
     mesh = mesh_build_cube();
@@ -35,13 +42,14 @@ void step_call(double time) {
 
 void draw_call() {
     cam_get_mvp(mvp, &camera, m);
-    draw_mesh(shader, mesh);
+    draw_mesh(shader, mesh, uniforms);
     check_gl_error();
 }
 
 void destroy_call() {
     free_mesh(mesh);
     free_shader(shader);
+    list_free_keep_elements(uniforms);
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {

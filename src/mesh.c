@@ -78,11 +78,11 @@ void map_shader_attrib(Shader *shader, int attrib, char *handle) {
     }
 }
 
-uniform_data* map_shader_uniform(Shader *shader, int type, char *handle, int count, void *pointer) {
+uniform_data* map_shader_uniform(Shader *shader, int type, char *handle, int count) {
     uniform_data *data = (uniform_data*) malloc(sizeof(uniform_data));
     data->handle = glGetUniformLocation(shader->prog, handle);
     data->count  = count;
-    data->data   = pointer;
+    data->hints  = 0;
 
     switch (type) {
         case MATRIX_4FV:
@@ -98,7 +98,7 @@ uniform_data* map_shader_uniform(Shader *shader, int type, char *handle, int cou
     return NULL;
 }
 
-void _bind_program_mesh(Shader *shader, Mesh *mesh) {
+void _bind_program_mesh(Shader *shader, Mesh *mesh, list *uniforms) {
     glUseProgram(shader->prog);
 
     for (int i = 0; i < NUMBER_ATTRIBUTES; i++) {
@@ -111,7 +111,7 @@ void _bind_program_mesh(Shader *shader, Mesh *mesh) {
 
     for (int i = 0; i < shader->unif->length; i++) {
         uniform_data *unif = (uniform_data*) list_get(shader->unif, i);
-        (unif->func)(unif->handle, unif->count, unif->data);
+        (unif->func)(unif->handle, unif->count, list_get(uniforms, i));
     }
 }
 
@@ -131,8 +131,8 @@ void _unbind_program_mesh(Shader *shader, Mesh *mesh) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void draw_mesh(Shader *shader, Mesh *mesh) {
-    _bind_program_mesh(shader, mesh);
+void draw_mesh(Shader *shader, Mesh *mesh, list *uniforms) {
+    _bind_program_mesh(shader, mesh, uniforms);
     _draw_mesh_tris(shader, mesh);
     _unbind_program_mesh(shader, mesh);
 }

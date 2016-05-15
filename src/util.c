@@ -10,7 +10,7 @@ list* split_string(char *str, char *pattern) {
     char *copy = strdup(str);
     char *substr;
     while ((substr = strsep(&copy, pattern))) {
-        list_add(l, substr);
+        list_add(l, strdup(substr));
     }
 
     free(copy);
@@ -266,14 +266,13 @@ Mesh* read_obj(const char *filename) {
                         ring_buffer_get(buffer, 1),
                         ring_buffer_get(buffer, 0)));
                 }
-                //list_free(vert);
+                list_free(vert);
             }
             ring_buffer_free(buffer);
         }
-
-        //list_free(parts);
+        list_free(parts);
     }
-    //list_free(lines);
+    list_free(lines);
 
     list_free_keep_elements(verts);
     list_free_keep_elements(norms);

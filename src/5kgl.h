@@ -252,7 +252,6 @@ typedef void (*_uniform_setter)(GLuint, int, void*);
 typedef struct {
     GLuint handle;
     int count;
-    void *data;
     _uniform_setter func;
     int hints;
 } uniform_data;
@@ -279,11 +278,11 @@ void free_shader(Shader*);
 
 void map_shader_attrib(Shader*, int, char*);
 
-uniform_data* map_shader_uniform(Shader*, int, char*, int, void*);
+uniform_data* map_shader_uniform(Shader*, int, char*, int);
 
 // rendering
 
-void draw_mesh(Shader*, Mesh*);
+void draw_mesh(Shader*, Mesh*, list*);
 
 // mesh construction, buffer packing and VBO busing
 
