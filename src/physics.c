@@ -17,8 +17,39 @@ vec3 collide(struct sphere_hitbox player, Hitbox hbox) {
 }
 
 vec3 collide_sphere_rect(struct sphere_hitbox player, struct rect_hitbox rect) {
-    (void) rect;
-    return player.pos;
+    double dx, dy, dz;
+
+    dx = player.pos.x - (rect.pos.x + rect.dim.x / 2);
+    dy = player.pos.y - (rect.pos.y + rect.dim.y / 2);
+    dz = player.pos.z - (rect.pos.z + rect.dim.z / 2);
+
+    if (abs(dx) > player.r && abs(dy) > player.r && abs(dz) > player.r) {
+        return player.pos;
+    }
+
+    dx /= rect.dim.x;
+    dy /= rect.dim.y;
+    dz /= rect.dim.z;
+
+    if (abs(dx) > abs(dy) && abs(dx) > abs(dz)) { // collide x
+        return (vec3) {
+            dx > 0 ? rect.pos.x + rect.dim.x + player.r : rect.pos.x - player.r,
+            player.pos.y,
+            player.pos.z
+        };
+    } else if (abs(dy) > abs(dz)) { // collide y
+        return (vec3) {
+            player.pos.x,
+            dy > 0 ? rect.pos.y + rect.dim.y + player.r : rect.pos.y - player.r,
+            player.pos.z
+        };
+    } else { // collide z
+        return (vec3) {
+            player.pos.x,
+            player.pos.y,
+            dz > 0 ? rect.pos.z + rect.dim.z + player.r : rect.pos.z - player.r
+        };
+    }
 }
 
 vec3 collide_sphere_sphere(struct sphere_hitbox player, struct sphere_hitbox sphere) {
