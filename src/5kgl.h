@@ -419,6 +419,13 @@ typedef struct {
     void *hitbox;
 } Hitbox;
 
+typedef struct {
+    Mesh *mesh;
+    Shader *shader;
+    list *uniforms;
+    Hitbox *hitbox;
+} Object;
+
 struct rect_hitbox {
     vec3 pos;
     vec3 dim;
