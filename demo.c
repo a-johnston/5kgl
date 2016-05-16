@@ -9,7 +9,7 @@ static Shader *shader;
 
 list *uniforms;
 
-void create_call() {
+void* create_call() {
     // create shader and map variables
     shader = make_shader("assets/color_vertex.glsl", "assets/color_fragment.glsl");
 
@@ -32,21 +32,25 @@ void create_call() {
     q = (quat) { 0.0, 0.0, 0.0, 1.0 };
     rot = quat_from_euler_angles(0.1, 0.5, 1.0);
 
+    return NULL;
 }
 
-void step_call(double time) {
+void step_call(void *data, double time) {
     (void) time;
+    (void) data;
     q = quat_mult(rot, q);
     quat_to_matrix(q, m);
 }
 
-void draw_call() {
+void draw_call(void *data) {
+    (void) data;
     cam_get_mvp(mvp, &camera, m);
     draw_mesh(shader, mesh, uniforms);
     check_gl_error();
 }
 
-void destroy_call() {
+void destroy_call(void *data) {
+    (void) data;
     free_mesh(mesh);
     free_shader(shader);
     list_free_keep_elements(uniforms);

@@ -343,13 +343,14 @@ Mesh* simplify_mesh(Mesh*);
  */
 
 typedef struct {
-    void (*create) ();
-    void (*step) (double);
-    void (*draw) ();
-    void (*destroy) ();
+    void   *data;
+    void* (*create)  ();
+    void  (*step)    (void*, double);
+    void  (*draw)    (void*);
+    void  (*destroy) (void*);
 } Actor;
 
-Actor* make_actor(void (*) (), void (*) (double), void (*) (), void (*) ());
+Actor* make_actor(void* (*) (), void (*) (void*, double), void (*) (void*), void (*) (void*));
 
 void add_actor(Actor*);
 

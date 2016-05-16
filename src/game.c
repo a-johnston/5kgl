@@ -6,15 +6,15 @@
 
 list *actors;
 
-Actor* make_actor(void (*create) (), void (*step) (double), void (*draw) (), void (*destroy) ()) {
+Actor* make_actor(void* (*create) (), void (*step) (void*, double), void (*draw) (void*), void (*destroy) (void*)) {
     Actor* actor = (Actor*) malloc(sizeof(Actor));
-    *actor = (Actor) { create, step, draw, destroy };
+    *actor = (Actor) { NULL, create, step, draw, destroy };
     return actor;
 }
 
 void add_actor(Actor* actor) {
     list_add(actors, actor);
-    (actor->create)();
+    actor->data = (actor->create)();
 }
 
 list* set_actors(list *new_actors) {
@@ -42,8 +42,10 @@ void step_scene(double time) {
         return;
     }
 
-    for (int i = 0; i < actors->length; i++) {
-        (((Actor*) list_get(actors, i))->step)(time);
+    int i = 0;
+    Actor *actor;
+    while (list_iterate(actors, &i, (void*) &actor)) {
+        (actor->step)(actor->data, time);
     }
 }
 
@@ -52,8 +54,10 @@ void draw_scene() {
         return;
     }
 
-    for (int i = 0; i < actors->length; i++) {
-        (((Actor*) list_get(actors, i))->draw)();
+    int i = 0;
+    Actor *actor;
+    while (list_iterate(actors, &i, (void*) &actor)) {
+        (actor->draw)(actor->data);
     }
 }
 
@@ -62,8 +66,10 @@ void end_scene() {
         return;
     }
 
-    for (int i = 0; i < actors->length; i++) {
-        (((Actor*) list_get(actors, i))->destroy)();
+    int i =0;
+    Actor *actor;
+    while (list_iterate(actors, &i, (void*) &actor)) {
+        (actor->destroy)(actor->data);
     }
 
     list_clear(actors);
