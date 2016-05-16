@@ -1,59 +1,71 @@
 #include <math.h>
 #include <5kgl.h>
 
-static Mesh *mesh;
-static mat4 m, mvp;
-static Camera camera;
-static quat rot, q;
-static Shader *shader;
+struct demo_data {
+    Mesh *mesh;
+    Shader *shader;
+    list *uniforms;
 
-list *uniforms;
+    mat4 m, mvp;
+    Camera camera;
+    quat rot, q;
+};
 
 void* create_call() {
+    struct demo_data *data = (struct demo_data*) malloc(sizeof(struct demo_data));
+
     // create shader and map variables
-    shader = make_shader("assets/color_vertex.glsl", "assets/color_fragment.glsl");
+    data->shader = make_shader("assets/color_vertex.glsl", "assets/color_fragment.glsl");
 
-    uniforms = create_list();
+    data->uniforms = create_list();
 
-    map_shader_attrib(shader, VERT, "position");
-    map_shader_attrib(shader, NORM, "normal");
+    map_shader_attrib(data->shader, VERT, "position");
+    map_shader_attrib(data->shader, NORM, "normal");
 
-    map_shader_uniform(shader, MATRIX_4FV, "mvp", 1);
-    map_shader_uniform(shader, MATRIX_4FV, "model", 1);
+    map_shader_uniform(data->shader, MATRIX_4FV, "mvp", 1);
+    map_shader_uniform(data->shader, MATRIX_4FV, "model", 1);
 
-    list_add(uniforms, &mvp);
-    list_add(uniforms, &m);
+    list_add(data->uniforms, &data->mvp);
+    list_add(data->uniforms, &data->m);
 
     // load mesh and send data to gpu
-    mesh = mesh_build_cube();
-    mesh_make_vbo(mesh);
+    data->mesh = mesh_build_cube();
+    mesh_make_vbo(data->mesh);
 
     // cube rotation matrix
-    q = (quat) { 0.0, 0.0, 0.0, 1.0 };
-    rot = quat_from_euler_angles(0.1, 0.5, 1.0);
+    data->q = (quat) { 0.0, 0.0, 0.0, 1.0 };
+    data->rot = quat_from_euler_angles(0.1, 0.5, 1.0);
 
-    return NULL;
+    // setup the camera
+    vec3 from = (vec3) { 2, 2, 2 };
+    vec3 to   = (vec3) { 0, 0, 0 };
+    vec3 up   = (vec3) { 0, 0, 1 };
+    cam_update_view(&data->camera, &from, &to, &up);
+    cam_update_perspective(&data->camera, 70.0f, 1.0f, 100.0f);
+
+    return data;
 }
 
-void step_call(void *data, double time) {
+void step_call(void *void_data, double time) {
     (void) time;
-    (void) data;
-    q = quat_mult(rot, q);
-    quat_to_matrix(q, m);
+    struct demo_data *data = (struct demo_data*) void_data;
+    data->q = quat_mult(data->rot, data->q);
+    quat_to_matrix(data->q, data->m);
 }
 
-void draw_call(void *data) {
-    (void) data;
-    cam_get_mvp(mvp, &camera, m);
-    draw_mesh(shader, mesh, uniforms);
+void draw_call(void *void_data) {
+    struct demo_data *data = (struct demo_data*) void_data;
+    cam_get_mvp(data->mvp, &data->camera, data->m);
+    draw_mesh(data->shader, data->mesh, data->uniforms);
     check_gl_error();
 }
 
-void destroy_call(void *data) {
-    (void) data;
-    free_mesh(mesh);
-    free_shader(shader);
-    list_free_keep_elements(uniforms);
+void destroy_call(void *void_data) {
+    struct demo_data *data = (struct demo_data*) void_data;
+    free_mesh(data->mesh);
+    free_shader(data->shader);
+    list_free_keep_elements(data->uniforms);
+    free(data);
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -68,13 +80,6 @@ int main() {
     // create a fullscreen window
     make_window(-1, -1, "5kgl");
     add_key_callback(key_callback);
-
-    // setup the camera
-    vec3 from = (vec3) { 2, 2, 2 };
-    vec3 to   = (vec3) { 0, 0, 0 };
-    vec3 up   = (vec3) { 0, 0, 1 };
-    cam_update_view(&camera, &from, &to, &up);
-    cam_update_perspective(&camera, 70.0f, 1.0f, 100.0f);
 
     //set the scene
     Actor *actor = make_actor(create_call, step_call, draw_call, destroy_call);
