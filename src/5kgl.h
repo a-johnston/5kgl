@@ -350,6 +350,10 @@ typedef struct {
     void  (*destroy) (void*);
 } Actor;
 
+void set_main_camera(Camera*);
+
+Camera* get_main_camera();
+
 Actor* make_actor(void* (*) (), void (*) (void*, double), void (*) (void*), void (*) (void*));
 
 void add_actor(Actor*);
