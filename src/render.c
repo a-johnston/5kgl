@@ -92,7 +92,7 @@ list *key_cb_list;
 
 void __key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     for (int i = 0; i < key_cb_list->length; i++) {
-        ((void (*) (GLFWwindow*, int, int, int, int)) list_get(key_cb_list, i))(window, key, scancode, action, mods);
+        ((GLFWkeyfun) list_get(key_cb_list, i))(window, key, scancode, action, mods);
     }
 }
 
@@ -174,11 +174,11 @@ GLFWwindow* make_window(int width, int height, char *title) {
     return window;
 }
 
-void add_key_callback(void (*f)(GLFWwindow*, int, int, int, int)) {
+void add_key_callback(GLFWkeyfun f) {
     list_add(key_cb_list, f);
 }
 
-void remove_key_callback(void (*f)(GLFWwindow*, int, int, int, int)) {
+void remove_key_callback(GLFWkeyfun f) {
     list_remove_element(key_cb_list, f);
 }
 

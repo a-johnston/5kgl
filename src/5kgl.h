@@ -388,9 +388,9 @@ void resize_callback(GLFWwindow*, int, int);
 
 float get_aspect_ratio();
 
-void add_key_callback(void (*) (GLFWwindow*, int, int, int, int));
+void add_key_callback(GLFWkeyfun);
 
-void remove_key_callback(void (*) (GLFWwindow*, int, int, int, int));
+void remove_key_callback(GLFWkeyfun);
 
 void get_cursor_position(double*, double*);
 
