@@ -198,6 +198,8 @@ void start_main_loop() {
     }
     end_game();
 
+    list_free_keep_elements(key_cb_list);
+
     glfwDestroyWindow(window);
     glfwTerminate();
 
