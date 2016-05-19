@@ -416,6 +416,7 @@ enum HitboxType {
     RECT = 0,
     SPHERE,
     PLANE,
+    MESH,
     HITBOX_NUM
 };
 

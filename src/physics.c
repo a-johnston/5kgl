@@ -10,9 +10,8 @@ vec3 collide(struct sphere_hitbox player, Hitbox hbox) {
             return collide_sphere_rect(player, *(struct rect_hitbox*) hbox.hitbox);
         case SPHERE:
             return collide_sphere_sphere(player, *(struct sphere_hitbox*) hbox.hitbox);
-        case PLANE:
-            break;
     }
+    fprintf(stderr, "unimplemented hitbox collision\n");
     return player.pos;
 }
 
