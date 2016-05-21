@@ -188,9 +188,13 @@ void get_cursor_position(double *x, double *y) {
 
 void start_main_loop() {
     glfwSetTime(0.0);
+    double temp, time = 0.0;
+
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
-        step_scene(glfwGetTime());
+        temp = glfwGetTime();
+        step_scene(time - temp);
+        time = temp;
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         draw_scene();

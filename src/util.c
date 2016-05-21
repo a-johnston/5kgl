@@ -18,6 +18,10 @@ list* split_string(char *str, char *pattern) {
     return l;
 }
 
+double clamp(double low, double value, double high) {
+    return value > high ? high : (value < low ? low : value);
+}
+
 list* create_list() {
     list* l = (list*) malloc(sizeof(list));
 
