@@ -18,6 +18,18 @@ list* split_string(char *str, char *pattern) {
     return l;
 }
 
+// src: djb2 http://www.cse.yorku.ca/~oz/hash.html
+int hash_string(char *str) {
+    int hash = 5381;
+    int c;
+
+    while ((c = *str++)) {
+        hash = ((hash << 5) + hash) + c;
+    }
+
+    return hash;
+}
+
 double clamp(double low, double value, double high) {
     return value > high ? high : (value < low ? low : value);
 }

@@ -20,11 +20,12 @@
 #define M_PI 3.141592653589793
 #endif
 
+#define DEFAULT_LIST_CAPACITY 16
+#define DEFAULT_STORE_SIZE 100
+
 /*
  * util.c
  */
-
-#define DEFAULT_LIST_CAPACITY 16
 
 typedef struct {
     void **data;
@@ -33,6 +34,8 @@ typedef struct {
 } list;
 
 list* split_string(char*, char*);
+
+int hash_string(char*);
 
 double clamp(double, double, double);
 
@@ -373,6 +376,10 @@ void draw_scene();
 void end_scene();
 
 void end_game();
+
+void add_to_store(char*, void*);
+
+void* get_from_store(char*);
 
 /*
  * render.c

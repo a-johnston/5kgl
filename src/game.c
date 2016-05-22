@@ -4,9 +4,11 @@
 
 #include "5kgl.h"
 
-list *actors = NULL;
+static list *actors = NULL;
 
-Camera *main_camera = NULL;
+static Camera *main_camera = NULL;
+
+static void **asset_store = NULL;
 
 void set_main_camera(Camera *camera) {
     main_camera = camera;
@@ -90,6 +92,24 @@ void end_scene() {
 void end_game() {
     end_scene();
     list_free(actors);
+    free(asset_store);
+}
+
+void add_to_store(char *key, void *asset) {
+    if (!asset_store) {
+        asset_store = (void**) malloc(sizeof(void**) * DEFAULT_STORE_SIZE);
+    }
+
+    // TODO: make a half decent hashtable for this/ something similar
+    asset_store[hash_string(key) % DEFAULT_STORE_SIZE] = asset;
+}
+
+void* get_from_store(char *key) {
+    if (!asset_store) {
+        return NULL;
+    }
+
+    return asset_store[hash_string(key) % DEFAULT_STORE_SIZE];
 }
 
 #endif
