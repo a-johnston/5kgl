@@ -403,6 +403,8 @@ void remove_key_callback(GLFWkeyfun);
 
 void get_cursor_position(double*, double*);
 
+void get_cursor_delta(double*, double*);
+
 GLFWwindow* make_window(int, int, char*);
 
 void start_main_loop();

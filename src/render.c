@@ -186,9 +186,19 @@ void get_cursor_position(double *x, double *y) {
     glfwGetCursorPos(window, x, y);
 }
 
+double oldX, oldY;
+
+void get_cursor_delta(double *x, double *y) {
+    double tx, ty;
+    get_cursor_position(&tx, &ty);
+    *x = tx - oldX;
+    *y = ty - oldY;
+}
+
 void start_main_loop() {
     glfwSetTime(0.0);
     double temp, time = 0.0;
+    get_cursor_position(&oldX, &oldY);
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -199,6 +209,7 @@ void start_main_loop() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         draw_scene();
         glfwSwapBuffers(window);
+        get_cursor_position(&oldX, &oldY);
     }
     end_game();
 
