@@ -1,4 +1,3 @@
-#include <math.h>
 #include <5kgl.h>
 
 struct demo_data {
