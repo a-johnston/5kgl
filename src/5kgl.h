@@ -24,6 +24,33 @@
 #define DEFAULT_STORE_SIZE 100
 
 /*
+ * vector.c
+ */
+
+typedef struct {
+    void *data;
+    int element_size;
+    int capacity;
+    int length;
+} Vector;
+
+#define vector_create(type_t) (_vector_create(sizeof(type_t)))
+
+Vector *_vector_create(int element_size);
+
+void vector_free(Vector *vector);
+
+int vector_add(Vector *vector, void *e);
+
+void vector_insert(Vector *vector, void *e, int i);
+
+void vector_remove(Vector *vector, int i);
+
+void vector_set(Vector *vector, void *e, int i);
+
+void *vector_get(Vector *vector, int i);
+
+/*
  * util.c
  */
 
