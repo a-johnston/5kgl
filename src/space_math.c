@@ -4,40 +4,7 @@
 
 #include "5kgl.h"
 
-double deg_to_rad = M_PI / 180.0;
-
-/*
- * Constructors
- */
-
-vec2* c_vec2(double x, double y) {
-    vec2* v = (vec2*) malloc(sizeof(vec2));
-    *v = (vec2) { x, y };
-    return v;
-}
-
-vec3* c_vec3(double x, double y, double z) {
-    vec3* v = (vec3*) malloc(sizeof(vec3));
-    *v = (vec3) { x, y, z };
-    return v;
-}
-
-ivec3* c_ivec3(int i, int j, int k) {
-    ivec3* v = (ivec3*) malloc(sizeof(ivec3));
-    *v = (ivec3) { i, j, k };
-    return v;
-}
-
-quat* c_quat(double x, double y, double z, double w) {
-    quat *q = (quat*) malloc(sizeof(quat));
-    *q = (quat) { x, y, z, w };
-    return q;
-}
-
-mat4* c_mat4() {
-    mat4* m = (mat4*) malloc(sizeof(mat4));
-    return m;
-}
+static double deg_to_rad = M_PI / 180.0;
 
 /*
  * Standard addition

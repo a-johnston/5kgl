@@ -201,6 +201,7 @@ void start_main_loop() {
     get_cursor_position(&oldX, &oldY);
 
     while (!glfwWindowShouldClose(window)) {
+        check_gl_error();
         glfwPollEvents();
         temp = glfwGetTime();
         step_scene(time - temp);

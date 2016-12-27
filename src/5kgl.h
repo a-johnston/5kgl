@@ -34,13 +34,15 @@ typedef struct {
     int length;
 } Vector;
 
-#define vector_create(type_t) (_vector_create(sizeof(type_t)))
-
-Vector *_vector_create(int element_size);
+Vector *vector_create(int element_size);
 
 void vector_free(Vector *vector);
 
+void vector_clear(Vector *vector);
+
 int vector_add(Vector *vector, void *e);
+
+void vector_add_all(Vector *vector, Vector *toAdd);
 
 void vector_insert(Vector *vector, void *e, int i);
 
@@ -115,15 +117,15 @@ int int_mod(int i, int m);
 //type definitions for vectors, quaternion, and matrix
 
 typedef struct {
-    double x, y;
+    float x, y;
 } vec2;
 
 typedef struct {
-    double x, y, z;
+    float x, y, z;
 } vec3;
 
 typedef struct {
-    double x, y, z, w;
+    float x, y, z, w;
 } quat;
 
 typedef float mat4[16];
@@ -131,18 +133,6 @@ typedef float mat4[16];
 typedef struct {
     int i, j, k;
 } ivec3;
-
-// constuctors
-
-vec2* c_vec2(double, double);
-
-vec3* c_vec3(double, double, double);
-
-ivec3* c_ivec3(int, int, int);
-
-quat* c_quat(double, double, double, double);
-
-mat4* c_mat4();
 
 vec2 add_vec2(vec2, vec2);
 
@@ -289,7 +279,7 @@ typedef struct {
 } uniform_data;
 
 typedef struct {
-    list *attr[NUMBER_ATTRIBUTES];
+    Vector *attr[NUMBER_ATTRIBUTES];
     GLuint vbo[NUMBER_ATTRIBUTES];
 } Mesh;
 
@@ -318,26 +308,6 @@ void draw_mesh(Shader*, Mesh*, list*);
 
 // mesh construction, buffer packing and VBO busing
 
-typedef GLuint (*_attrib_buffer_maker)(Mesh*);
-
-void pack_vec3(list*, float[]);
-
-void pack_vec2(list*, float[]);
-
-void pack_ivec3(list*, short[]);
-
-void pack_color(list*, float[]);
-
-GLuint make_vert_buffer(Mesh*);
-
-GLuint make_norm_buffer(Mesh*);
-
-GLuint make_tri_buffer(Mesh*);
-
-GLuint make_color_buffer(Mesh*);
-
-GLuint make_uv_buffer(Mesh*);
-
 Mesh* make_mesh();
 
 void free_mesh(Mesh*);
@@ -348,15 +318,7 @@ void mesh_translate(Mesh*, vec3);
 
 void mesh_scale(Mesh*, double n);
 
-int mesh_add_point(Mesh*, vec3*);
-
-int mesh_add_tri(Mesh*, ivec3*);
-
-int mesh_add_normal(Mesh*, vec3*);
-
-int mesh_add_uv(Mesh*, vec2*);
-
-int mesh_add_color(Mesh*, color*);
+int mesh_add(Mesh*, int, void*);
 
 void mesh_build_triangle(Mesh*, vec3*, vec3*, vec3*);
 

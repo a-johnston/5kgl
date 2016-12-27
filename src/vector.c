@@ -18,12 +18,13 @@ static void _ensure_capacity(Vector *vector, int capacity) {
     }
 }
 
-Vector *_vector_create(int element_size) {
+Vector *vector_create(int element_size) {
     Vector *vector = (Vector*) malloc(sizeof(Vector));
     vector->data = calloc(10, element_size);
     vector->element_size = element_size;
     vector->capacity = 10;
     vector->length = 0;
+
     return vector;
 }
 
@@ -32,10 +33,23 @@ void vector_free(Vector *vector) {
     free(vector);
 }
 
+void vector_clear(Vector *vector) {
+    vector->length = 0;
+}
+
 int vector_add(Vector *vector, void *e) {
     _ensure_capacity(vector, vector->length + 1);
     vector_set(vector, e, vector->length);
     return vector->length++;
+}
+
+void vector_add_all(Vector *vector, Vector *toAdd) {
+    _ensure_capacity(vector, vector->length + toAdd->length);
+    memcpy(
+        vector->data + vector->length * vector->element_size,
+        toAdd->data,
+        toAdd->length * vector->element_size
+    );
 }
 
 void vector_insert(Vector *vector, void *e, int i) {

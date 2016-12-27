@@ -240,17 +240,17 @@ Mesh* read_obj(const char *filename) {
         if (strcmp("v", tag) == 0) {
             // 5kgl does not support homogeneous coordinates in Mesh structs,
             // so this block ignores the 4th parameter if given
-            vec3* v = c_vec3(0.0, 0.0, 0.0);
-            sscanf(line, "v %lf %lf %lf", &v->x, &v->y, &v->z);
-            list_add(verts, v);
+            vec3 v;
+            sscanf(line, "v %f %f %f", &v.x, &v.y, &v.z);
+            list_add(verts, &v);
         } else if (strcmp("vt", tag) == 0) {
-            vec2* v = c_vec2(0.0, 0.0);
-            sscanf(line, "vt %lf %lf", &v->x, &v->y);
-            list_add(uvs, v);
+            vec2 v;
+            sscanf(line, "vt %f %f", &v.x, &v.y);
+            list_add(uvs, &v);
         } else if (strcmp("vn", tag) == 0) {
-            vec3* v = c_vec3(0.0, 0.0, 0.0);
-            sscanf(line, "vn %lf %lf %lf", &v->x, &v->y, &v->z);
-            list_add(norms, v);
+            vec3 v;
+            sscanf(line, "vn %f %f %f", &v.x, &v.y, &v.z);
+            list_add(norms, &v);
         } else if (strcmp("f", tag) == 0) {
             ring_buffer *buffer = make_ring_buffer(2);
 
@@ -262,25 +262,27 @@ Mesh* read_obj(const char *filename) {
                 list *vert = split_string((char*) str, "/");
 
                 // add point and add index to buffer
-                ring_buffer_add(buffer, mesh_add_point(mesh, list_get(verts, atoi(list_get(vert, 0)) - 1)));
+                ring_buffer_add(buffer, mesh_add(mesh, VERT, list_get(verts, atoi(list_get(vert, 0)) - 1)));
 
                 // add UV information if it exists
                 if (vert->length > 1 && strlen((char*) list_get(vert, 1)) > 0) {
-                    mesh_add_uv(mesh, list_get(uvs, atoi(list_get(vert, 1)) - 1));
+                    mesh_add(mesh, UV, list_get(uvs, atoi(list_get(vert, 1)) - 1));
                 }
 
                 // add normal information if it exists
                 if (vert->length > 2 && strlen((char*) list_get(vert, 2)) > 0) {
-                    mesh_add_normal(mesh, list_get(norms, atoi(list_get(vert, 2)) - 1));
+                    mesh_add(mesh, NORM, list_get(norms, atoi(list_get(vert, 2)) - 1));
                 }
 
                 if (buffer->i == 1) { // holds the first point as a reference for the convex hull
                     c = ring_buffer_get(buffer, 0);
                 } else if (buffer->i > 2) { // builds the triangle assuming the ngon is a convex hull
-                    mesh_add_tri(mesh, c_ivec3(
+                    ivec3 tri = (ivec3) {
                         c,
                         ring_buffer_get(buffer, 1),
-                        ring_buffer_get(buffer, 0)));
+                        ring_buffer_get(buffer, 0)
+                    };
+                    mesh_add(mesh, TRIS, &tri);
                 }
                 list_free(vert);
             }
@@ -300,19 +302,17 @@ Mesh* read_obj(const char *filename) {
 Mesh* read_raw(const char *filename) {
     Mesh *mesh = make_mesh();
 
-    double x1, y1, z1,
-           x2, y2, z2,
-           x3, y3, z3;
+    float x1, y1, z1, x2, y2, z2, x3, y3, z3;
 
     list *lines = read_lines(filename);
     for (int i = 0; i < lines->length; i++) {
-        sscanf((char*) list_get(lines, i), "%lf %lf %lf %lf %lf %lf %lf %lf %lf",
+        sscanf((char*) list_get(lines, i), "%f %f %f %f %f %f %f %f %f",
             &x1, &y1, &z1, &x2, &y2, &z2, &x3, &y3, &z3);
 
         mesh_build_triangle(mesh,
-            c_vec3(x1, y1, z1),
-            c_vec3(x2, y2, z2),
-            c_vec3(x3, y3, z3));
+            &(vec3) { x1, y1, z1 },
+            &(vec3) { x2, y2, z2 },
+            &(vec3) { x3, y3, z3 });
     }
 
     return mesh;
