@@ -45,6 +45,12 @@ int vector_add(Vector *vector, void *e) {
     return vector->length++;
 }
 
+int vector_add_p(Vector *vector, void *p) {
+    _ensure_capacity(vector, vector->length + 1);
+    ((void**) vector->data)[vector->length] = p;
+    return vector->length++;
+}
+
 void vector_add_all(Vector *vector, Vector *toAdd) {
     _ensure_capacity(vector, vector->length + toAdd->length);
     memcpy(
@@ -86,6 +92,10 @@ void vector_set(Vector *vector, void *e, int i) {
 
 void *vector_get(Vector *vector, int i) {
     return vector->data + vector->element_size * i;
+}
+
+void *vector_get_p(Vector *vector, int i) {
+    return ((void**) vector->data)[i];
 }
 
 #endif

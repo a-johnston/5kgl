@@ -9,7 +9,7 @@
  */
 
 void _pass_gl_matrix_4fv(GLuint handle, int count, void *matrix) {
-    glUniformMatrix4fv(handle, count, GL_FALSE, *((mat4*) matrix));
+    glUniformMatrix4fv(handle, count, GL_FALSE, matrix);
 }
 
 void _pass_gl_texture_2d(GLuint handle, int texUnit, void *texId) {
@@ -53,7 +53,7 @@ Shader* make_shader(char *vertex, char *fragment) {
     }
 
     shader->draw_mode = GL_TRIANGLES;
-    shader->unif = create_list();
+    shader->unif = vector_create(sizeof(uniform_data));
 
     return shader;
 }
@@ -62,7 +62,7 @@ void free_shader(Shader* shader) {
     glDeleteShader(shader->vert);
     glDeleteShader(shader->frag);
     glDeleteProgram(shader->prog);
-    list_free(shader->unif);
+    vector_free(shader->unif);
     free(shader);
 }
 
@@ -79,26 +79,30 @@ void map_shader_attrib(Shader *shader, int attrib, char *handle) {
 }
 
 uniform_data* map_shader_uniform(Shader *shader, int type, char *handle, int count) {
-    uniform_data *data = (uniform_data*) malloc(sizeof(uniform_data));
-    data->handle = glGetUniformLocation(shader->prog, handle);
-    data->count  = count;
-    data->hints  = 0;
+    uniform_data data;
+    data.handle = glGetUniformLocation(shader->prog, handle);
+    data.count  = count;
+    data.hints  = 0;
+    data.func = NULL;
 
     switch (type) {
         case MATRIX_4FV:
-            data->func = _pass_gl_matrix_4fv;
-            list_add(shader->unif, data);
-            return data;
+            data.func = _pass_gl_matrix_4fv;
+            break;
         case TEXTURE_2D:
-            data->func = _pass_gl_texture_2d;
-            list_add(shader->unif, data);
-            return data;
+            data.func = _pass_gl_texture_2d;
+            break;
     }
 
-    return NULL;
+    if (data.func) {
+        int i = vector_add(shader->unif, &data);
+        return vector_get(shader->unif, i);
+    } else {
+        return NULL;
+    }
 }
 
-void _bind_program_mesh(Shader *shader, Mesh *mesh, list *uniforms) {
+static void bind_program_mesh(Shader *shader, Mesh *mesh, Vector *uniforms) {
     glUseProgram(shader->prog);
 
     for (int i = 0; i < NUMBER_ATTRIBUTES; i++) {
@@ -110,18 +114,18 @@ void _bind_program_mesh(Shader *shader, Mesh *mesh, list *uniforms) {
     }
 
     for (int i = 0; i < shader->unif->length; i++) {
-        uniform_data *unif = (uniform_data*) list_get(shader->unif, i);
-        (unif->func)(unif->handle, unif->count, list_get(uniforms, i));
+        uniform_data *unif = (uniform_data*) vector_get(shader->unif, i);
+        (unif->func)(unif->handle, unif->count, *(void**) vector_get(uniforms, i));
     }
 }
 
-void _draw_mesh_tris(Shader *shader, Mesh *mesh) {
+static void draw_mesh_tris(Shader *shader, Mesh *mesh) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->vbo[TRIS]);
-    //TODO investigate magic 6
-    glDrawElements(shader->draw_mode, mesh->attr[TRIS]->length * 6, GL_UNSIGNED_INT, 0);
+    // magic 3 likely won't work if not disjoint triangles, ie strips
+    glDrawElements(shader->draw_mode, mesh->attr[TRIS]->length * 3, GL_UNSIGNED_INT, 0);
 }
 
-void _unbind_program_mesh(Shader *shader, Mesh *mesh) {
+static void unbind_program_mesh(Shader *shader, Mesh *mesh) {
     for (int i = 0; i < NUMBER_ATTRIBUTES; i++) {
         if (mesh->vbo[i] != _NO_MAPPING && shader->handles[i] != _NO_MAPPING) {
             glDisableVertexAttribArray(shader->handles[i]);
@@ -132,10 +136,10 @@ void _unbind_program_mesh(Shader *shader, Mesh *mesh) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void draw_mesh(Shader *shader, Mesh *mesh, list *uniforms) {
-    _bind_program_mesh(shader, mesh, uniforms);
-    _draw_mesh_tris(shader, mesh);
-    _unbind_program_mesh(shader, mesh);
+void draw_mesh(Shader *shader, Mesh *mesh, Vector *uniforms) {
+    bind_program_mesh(shader, mesh, uniforms);
+    draw_mesh_tris(shader, mesh);
+    unbind_program_mesh(shader, mesh);
 }
 
 static int bytesPerAttr[] = {

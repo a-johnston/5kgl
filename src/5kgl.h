@@ -20,8 +20,6 @@
 #define M_PI 3.141592653589793
 #endif
 
-#define DEFAULT_LIST_CAPACITY 16
-
 /*
  * vector.c
  */
@@ -42,6 +40,8 @@ void vector_clear(Vector *vector);
 
 int vector_add(Vector *vector, void *e);
 
+int vector_add_p(Vector *vector, void *p);
+
 void vector_add_all(Vector *vector, Vector *toAdd);
 
 void vector_insert(Vector *vector, void *e, int i);
@@ -52,45 +52,17 @@ void vector_set(Vector *vector, void *e, int i);
 
 void *vector_get(Vector *vector, int i);
 
+void *vector_get_p(Vector *vector, int i);
+
 /*
  * util.c
  */
-
-typedef struct {
-    void **data;
-    int capacity;
-    int length;
-} list;
 
 Vector* split_string(char*, char*);
 
 int hash_string(char*);
 
 double clamp(double, double, double);
-
-list* create_list();
-
-int list_add(list*, void*);
-
-void list_add_all(list*, list*);
-
-void* list_insert(list*, void*, int);
-
-void* list_get(list*, int);
-
-int list_find(list*, void*);
-
-void* list_iterate(list*, int*, void**);
-
-void* list_remove(list*, int);
-
-int list_remove_element(list*, void*);
-
-void list_clear(list*);
-
-void list_free(list*);
-
-void list_free_keep_elements(list*);
 
 void* read_file(const char*, int*);
 
@@ -273,7 +245,7 @@ typedef struct {
     GLuint vert, frag, prog;
     GLuint handles[NUMBER_ATTRIBUTES];
     GLuint draw_mode;
-    list *unif;
+    Vector *unif;
 } Shader;
 
 // shader construction
@@ -290,7 +262,7 @@ uniform_data* map_shader_uniform(Shader*, int, char*, int);
 
 // rendering
 
-void draw_mesh(Shader*, Mesh*, list*);
+void draw_mesh(Shader*, Mesh*, Vector*);
 
 // mesh construction, buffer packing and VBO busing
 
@@ -410,7 +382,7 @@ typedef struct {
 typedef struct {
     Mesh *mesh;
     Shader *shader;
-    list *uniforms;
+    Vector *uniforms;
     Hitbox *hitbox;
 } Object;
 

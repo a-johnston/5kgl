@@ -3,7 +3,7 @@
 struct demo_data {
     Mesh *mesh;
     Shader *shader;
-    list *uniforms;
+    Vector *uniforms;
 
     mat4 m, mvp;
     Camera camera;
@@ -16,7 +16,7 @@ void* create_call() {
     // create shader and map variables
     data->shader = make_shader("assets/color_vertex.glsl", "assets/color_fragment.glsl");
 
-    data->uniforms = create_list();
+    data->uniforms = vector_create(sizeof(void*));
 
     map_shader_attrib(data->shader, VERT, "position");
     map_shader_attrib(data->shader, NORM, "normal");
@@ -24,12 +24,11 @@ void* create_call() {
     map_shader_uniform(data->shader, MATRIX_4FV, "mvp", 1);
     map_shader_uniform(data->shader, MATRIX_4FV, "model", 1);
 
-    list_add(data->uniforms, &data->mvp);
-    list_add(data->uniforms, &data->m);
+    vector_add_p(data->uniforms, data->mvp);
+    vector_add_p(data->uniforms, data->m);
 
     // load mesh and send data to gpu
-    // data->mesh = mesh_build_cube();
-    data->mesh = read_obj("assets/untitled.obj");
+    data->mesh = mesh_build_cube();
 
     mesh_make_vbo(data->mesh);
 
@@ -65,7 +64,7 @@ void destroy_call(void *void_data) {
     struct demo_data *data = (struct demo_data*) void_data;
     free_mesh(data->mesh);
     free_shader(data->shader);
-    list_free_keep_elements(data->uniforms);
+    vector_free(data->uniforms);
     free(data);
 }
 
