@@ -83,8 +83,8 @@ int main() {
     add_key_callback(key_callback);
 
     //set the scene
-    Actor *actor = make_actor(create_call, step_call, draw_call, destroy_call);
-    add_actor(actor);
+    Actor actor = make_actor(create_call, step_call, draw_call, destroy_call);
+    add_actor(&actor);
 
     start_main_loop();
 

@@ -88,11 +88,11 @@ GLFWwindow *window;
 GLFWmonitor *monitor;
 
 int w, h;
-list *key_cb_list;
+Vector *key_callbacks;
 
 void __key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
-    for (int i = 0; i < key_cb_list->length; i++) {
-        ((GLFWkeyfun) list_get(key_cb_list, i))(window, key, scancode, action, mods);
+    for (int i = 0; i < key_callbacks->length; i++) {
+        (*(GLFWkeyfun*) vector_get(key_callbacks, i))(window, key, scancode, action, mods);
     }
 }
 
@@ -101,7 +101,7 @@ GLFWwindow* make_window(int width, int height, char *title) {
         return window;
     }
 
-    key_cb_list = create_list();
+    key_callbacks = vector_create(sizeof(GLFWkeyfun*));
 
     if (!glfwInit()) {
         fprintf(stderr, "Failed to init GLFW!\n");
@@ -169,17 +169,23 @@ GLFWwindow* make_window(int width, int height, char *title) {
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-    set_actors(create_list());
+    set_actors(vector_create(sizeof(Actor)));
 
     return window;
 }
 
 void add_key_callback(GLFWkeyfun f) {
-    list_add(key_cb_list, f);
+    vector_add(key_callbacks, &f);
 }
 
 void remove_key_callback(GLFWkeyfun f) {
-    list_remove_element(key_cb_list, f);
+    for (int i = 0; i < key_callbacks->length; i++) {
+        GLFWkeyfun t = *(GLFWkeyfun*) vector_get(key_callbacks, i);
+        if (t == f) {
+            vector_remove(key_callbacks, i);
+            i--;
+        }
+    }
 }
 
 void get_cursor_position(double *x, double *y) {
@@ -200,6 +206,7 @@ void start_main_loop() {
     double temp, time = 0.0;
     get_cursor_position(&oldX, &oldY);
 
+    start_game();
     while (!glfwWindowShouldClose(window)) {
         check_gl_error();
         glfwPollEvents();
@@ -214,7 +221,7 @@ void start_main_loop() {
     }
     end_game();
 
-    list_free_keep_elements(key_cb_list);
+    vector_free(key_callbacks);
 
     glfwDestroyWindow(window);
     glfwTerminate();

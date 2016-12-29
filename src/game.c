@@ -4,11 +4,9 @@
 
 #include "5kgl.h"
 
-static list *actors = NULL;
+static Vector *actors = NULL;
 
 static Camera *main_camera = NULL;
-
-static void **asset_store = NULL;
 
 void set_main_camera(Camera *camera) {
     main_camera = camera;
@@ -18,24 +16,20 @@ Camera* get_main_camera() {
     return main_camera;
 }
 
-Actor* make_actor(void* (*create) (), void (*step) (void*, double), void (*draw) (void*), void (*destroy) (void*)) {
-    Actor* actor = (Actor*) malloc(sizeof(Actor));
-    *actor = (Actor) { NULL, create, step, draw, destroy };
-    return actor;
+Actor make_actor(void* (*create) (), void (*step) (void*, double), void (*draw) (void*), void (*destroy) (void*)) {
+    return (Actor) { NULL, create, step, draw, destroy };
 }
 
 void add_actor(Actor* actor) {
-    list_add(actors, actor);
-    if (actor->create) actor->data = actor->create();
+    vector_add(actors, actor);
 }
 
-list* set_actors(list *new_actors) {
-    list* temp = actors;
+void set_actors(Vector *new_actors) {
+    if (actors) vector_free(actors);
     actors = new_actors;
-    return temp;
 }
 
-list* get_actors() {
+Vector *get_actors() {
     return actors;
 }
 
@@ -44,10 +38,12 @@ void start_game() {
         return;
     }
 
-    int i = 0;
-    Actor *actor;
-    while (list_iterate(actors, &i, (void*) &actor)) {
-        if (actor->create) actor->create();
+    for (int i = 0; i < actors->length; i++) {
+        Actor *actor = vector_get(actors, i);
+
+        if (actor->create && !actor->data) {
+            actor->data = actor->create();
+        }
     }
 }
 
@@ -56,9 +52,8 @@ void step_scene(double time) {
         return;
     }
 
-    int i = 0;
-    Actor *actor;
-    while (list_iterate(actors, &i, (void*) &actor)) {
+    for (int i = 0; i < actors->length; i++) {
+        Actor *actor = vector_get(actors, i);
         if (actor->step) actor->step(actor->data, time);
     }
 }
@@ -68,9 +63,8 @@ void draw_scene() {
         return;
     }
 
-    int i = 0;
-    Actor *actor;
-    while (list_iterate(actors, &i, (void*) &actor)) {
+    for (int i = 0; i < actors->length; i++) {
+        Actor *actor = vector_get(actors, i);
         if (actor->draw) actor->draw(actor->data);
     }
 }
@@ -80,36 +74,17 @@ void end_scene() {
         return;
     }
 
-    int i =0;
-    Actor *actor;
-    while (list_iterate(actors, &i, (void*) &actor)) {
+    for (int i = 0; i < actors->length; i++) {
+        Actor *actor = vector_get(actors, i);
         if (actor->destroy) actor->destroy(actor->data);
     }
 
-    list_clear(actors);
+    vector_clear(actors);
 }
 
 void end_game() {
     end_scene();
-    list_free(actors);
-    free(asset_store);
-}
-
-void add_to_store(char *key, void *asset) {
-    if (!asset_store) {
-        asset_store = (void**) malloc(sizeof(void**) * DEFAULT_STORE_SIZE);
-    }
-
-    // TODO: make a half decent hashtable for this/ something similar
-    asset_store[hash_string(key) % DEFAULT_STORE_SIZE] = asset;
-}
-
-void* get_from_store(char *key) {
-    if (!asset_store) {
-        return NULL;
-    }
-
-    return asset_store[hash_string(key) % DEFAULT_STORE_SIZE];
+    vector_free(actors);
 }
 
 #endif

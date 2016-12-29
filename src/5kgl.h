@@ -21,7 +21,6 @@
 #endif
 
 #define DEFAULT_LIST_CAPACITY 16
-#define DEFAULT_STORE_SIZE 100
 
 /*
  * vector.c
@@ -335,13 +334,13 @@ void set_main_camera(Camera*);
 
 Camera* get_main_camera();
 
-Actor* make_actor(void* (*) (), void (*) (void*, double), void (*) (void*), void (*) (void*));
+Actor make_actor(void* (*) (), void (*) (void*, double), void (*) (void*), void (*) (void*));
 
 void add_actor(Actor*);
 
-list* set_actors(list*);
+void set_actors(Vector*);
 
-list* get_actors();
+Vector *get_actors();
 
 void start_game();
 
@@ -352,10 +351,6 @@ void draw_scene();
 void end_scene();
 
 void end_game();
-
-void add_to_store(char*, void*);
-
-void* get_from_store(char*);
 
 /*
  * render.c
