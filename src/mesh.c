@@ -237,6 +237,18 @@ void mesh_build_quad(Mesh *m, vec3 *a, vec3 *b, vec3 *c, vec3 *d) {
     mesh_add(m, NORM, &norm);
     mesh_add(m, NORM, &norm);
     mesh_add(m, NORM, &norm);
+
+    vec2 uv = (vec2) { 0.0, 0.0 };
+    mesh_add(m, UV, &uv);
+
+    uv = (vec2) { 0.0, 1.0 };
+    mesh_add(m, UV, &uv);
+
+    uv = (vec2) { 1.0, 0.0 };
+    mesh_add(m, UV, &uv);
+
+    uv = (vec2) { 1.0, 1.0 };
+    mesh_add(m, UV, &uv);
 }
 
 Mesh* mesh_build_cube() {
