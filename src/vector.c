@@ -24,11 +24,13 @@ Vector *vector_create(int element_size) {
     vector->element_size = element_size;
     vector->capacity = 10;
     vector->length = 0;
+    vector->fof = NULL;
 
     return vector;
 }
 
 void vector_free(Vector *vector) {
+    free(vector->fof);
     free(vector->data);
     free(vector);
 }

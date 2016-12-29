@@ -32,6 +32,7 @@ typedef struct {
     int element_size;
     int capacity;
     int length;
+    void *fof;
 } Vector;
 
 Vector *vector_create(int element_size);
@@ -62,7 +63,7 @@ typedef struct {
     int length;
 } list;
 
-list* split_string(char*, char*);
+Vector* split_string(char*, char*);
 
 int hash_string(char*);
 
@@ -93,20 +94,6 @@ void list_free(list*);
 void list_free_keep_elements(list*);
 
 void* read_file(const char*, int*);
-
-typedef struct {
-    int *data;
-    int size;
-    int i;
-} ring_buffer;
-
-ring_buffer* make_ring_buffer(int);
-
-void ring_buffer_free(ring_buffer*);
-
-void ring_buffer_add(ring_buffer*, int);
-
-int ring_buffer_get(ring_buffer*, int);
 
 int int_mod(int i, int m);
 
@@ -400,7 +387,7 @@ void start_main_loop();
 
 // extra util stuff
 
-list* read_lines(const char*);
+Vector* read_lines(const char*);
 
 Mesh* read_obj(const char*);
 

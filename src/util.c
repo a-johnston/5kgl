@@ -4,16 +4,16 @@
 
 #include "5kgl.h"
 
-list* split_string(char *str, char *pattern) {
-    list *l = create_list();
+Vector* split_string(char *str, char *pattern) {
+    Vector *l = vector_create(sizeof(char*));
 
     char *copy = strdup(str);
     char *substr;
     while ((substr = strsep(&copy, pattern))) {
-        list_add(l, strdup(substr));
+        vector_add(l, &substr);
     }
 
-    free(copy);
+    l->fof = copy;
 
     return l;
 }
@@ -160,30 +160,6 @@ void list_free_keep_elements(list *l) {
     }
 }
 
-ring_buffer* make_ring_buffer(int size) {
-    ring_buffer *buffer = (ring_buffer*) malloc(sizeof(ring_buffer));
-    *buffer = (ring_buffer) {
-        (int*) malloc(size * sizeof(int)),
-        size,
-        0
-    };
-    return buffer;
-}
-
-void ring_buffer_free(ring_buffer *buffer) {
-    free(buffer->data);
-    free(buffer);
-}
-
-void ring_buffer_add(ring_buffer *ring, int i) {
-    ring->data[int_mod(ring->i, ring->size)] = i;
-    ring->i++;
-}
-
-int ring_buffer_get(ring_buffer *ring, int i) {
-    return ring->data[int_mod((ring->i - 1) + i, ring->size)];
-}
-
 int int_mod(int i, int m) {
     if (i >= 0) {
         return i % m;
@@ -213,11 +189,11 @@ void* read_file(const char *filename, int *length) {
     return buffer;
 }
 
-list* read_lines(const char *filename) {
+Vector* read_lines(const char *filename) {
     int length;
     void *buffer = read_file(filename, &length);
-    list *l = split_string((char*) buffer, "\n");
-    list_remove(l, l->length - 1); // TODO this might be garbage, but files should end with newline
+    Vector *l = split_string((char*) buffer, "\n");
+    vector_remove(l, l->length - 1); // TODO this might be garbage, but files should end with newline
     free(buffer);
     return l;
 }
@@ -225,76 +201,75 @@ list* read_lines(const char *filename) {
 Mesh* read_obj(const char *filename) {
     Mesh *mesh = make_mesh();
 
-    list *verts = create_list();
-    list *norms = create_list();
-    list *uvs   = create_list();
+    Vector *verts = vector_create(sizeof(vec3));
+    Vector *norms = vector_create(sizeof(vec3));
+    Vector *uvs   = vector_create(sizeof(vec2));
 
-    list *lines = read_lines(filename);
+    Vector *lines = read_lines(filename);
     for (int i = 0; i < lines->length; i++) {
-        char *line = (char*) list_get(lines, i);
+        char *line = *(char**) vector_get(lines, i);
 
-        list *parts = split_string(line, " ");
+        Vector *parts = split_string(line, " ");
 
-        char *tag = (char*) list_get(parts, 0);
+        char *tag = *(char**) vector_get(parts, 0);
 
         if (strcmp("v", tag) == 0) {
             // 5kgl does not support homogeneous coordinates in Mesh structs,
             // so this block ignores the 4th parameter if given
             vec3 v;
             sscanf(line, "v %f %f %f", &v.x, &v.y, &v.z);
-            list_add(verts, &v);
+            vector_add(verts, &v);
         } else if (strcmp("vt", tag) == 0) {
             vec2 v;
             sscanf(line, "vt %f %f", &v.x, &v.y);
-            list_add(uvs, &v);
+            vector_add(uvs, &v);
         } else if (strcmp("vn", tag) == 0) {
             vec3 v;
             sscanf(line, "vn %f %f %f", &v.x, &v.y, &v.z);
-            list_add(norms, &v);
+            vector_add(norms, &v);
         } else if (strcmp("f", tag) == 0) {
-            ring_buffer *buffer = make_ring_buffer(2);
+            int buffer[2];
 
             int c = -1;
-            int i = 1;
-            void *str;
+            char *str;
 
-            while (list_iterate(parts, &i, &str)) {
-                list *vert = split_string((char*) str, "/");
+            for (int j = 1; j < parts->length; j++) {
+                str = *(char**) vector_get(parts, j);
+                Vector *vert = split_string((char*) str, "/");
 
                 // add point and add index to buffer
-                ring_buffer_add(buffer, mesh_add(mesh, VERT, list_get(verts, atoi(list_get(vert, 0)) - 1)));
+                buffer[(j - 1) % 2] = mesh_add(mesh, VERT, vector_get(verts, atoi(*(char**) vector_get(vert, 0)) - 1));
 
                 // add UV information if it exists
-                if (vert->length > 1 && strlen((char*) list_get(vert, 1)) > 0) {
-                    mesh_add(mesh, UV, list_get(uvs, atoi(list_get(vert, 1)) - 1));
+                if (vert->length > 1 && strlen(*(char**) vector_get(vert, 1)) > 0) {
+                    mesh_add(mesh, UV, vector_get(uvs, atoi(*(char**) vector_get(vert, 1)) - 1));
                 }
 
                 // add normal information if it exists
-                if (vert->length > 2 && strlen((char*) list_get(vert, 2)) > 0) {
-                    mesh_add(mesh, NORM, list_get(norms, atoi(list_get(vert, 2)) - 1));
+                if (vert->length > 2 && strlen(*(char**) vector_get(vert, 2)) > 0) {
+                    mesh_add(mesh, NORM, vector_get(norms, atoi(*(char**) vector_get(vert, 2)) - 1));
                 }
 
-                if (buffer->i == 1) { // holds the first point as a reference for the convex hull
-                    c = ring_buffer_get(buffer, 0);
-                } else if (buffer->i > 2) { // builds the triangle assuming the ngon is a convex hull
+                if (j == 1) { // holds the first point as a reference for the convex hull
+                    c = buffer[0];
+                } else if (j > 2) { // builds the triangle assuming the ngon is a convex hull
                     ivec3 tri = (ivec3) {
                         c,
-                        ring_buffer_get(buffer, 1),
-                        ring_buffer_get(buffer, 0)
+                        buffer[j % 2],
+                        buffer[(j + 1) % 2]
                     };
                     mesh_add(mesh, TRIS, &tri);
                 }
-                list_free(vert);
+                vector_free(vert);
             }
-            ring_buffer_free(buffer);
         }
-        list_free(parts);
+        vector_free(parts);
     }
-    list_free(lines);
+    vector_free(lines);
 
-    list_free_keep_elements(verts);
-    list_free_keep_elements(norms);
-    list_free_keep_elements(uvs);
+    vector_free(verts);
+    vector_free(norms);
+    vector_free(uvs);
 
     return mesh;
 }
@@ -304,9 +279,9 @@ Mesh* read_raw(const char *filename) {
 
     float x1, y1, z1, x2, y2, z2, x3, y3, z3;
 
-    list *lines = read_lines(filename);
+    Vector *lines = read_lines(filename);
     for (int i = 0; i < lines->length; i++) {
-        sscanf((char*) list_get(lines, i), "%f %f %f %f %f %f %f %f %f",
+        sscanf(*(char**) vector_get(lines, i), "%f %f %f %f %f %f %f %f %f",
             &x1, &y1, &z1, &x2, &y2, &z2, &x3, &y3, &z3);
 
         mesh_build_triangle(mesh,

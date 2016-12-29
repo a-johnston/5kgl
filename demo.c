@@ -28,7 +28,9 @@ void* create_call() {
     list_add(data->uniforms, &data->m);
 
     // load mesh and send data to gpu
-    data->mesh = mesh_build_cube();
+    // data->mesh = mesh_build_cube();
+    data->mesh = read_obj("assets/untitled.obj");
+
     mesh_make_vbo(data->mesh);
 
     // cube rotation matrix
